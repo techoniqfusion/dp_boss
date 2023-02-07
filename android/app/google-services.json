@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "412464647081",
+    "project_id": "dp-boss-95e4b",
+    "storage_bucket": "dp-boss-95e4b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:412464647081:android:3b12a442cef9410450d2b8",
+        "android_client_info": {
+          "package_name": "com.example.dp_boss"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "412464647081-uv79mu9cqm0tit7il3drhhm9hibqm12p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJvUglNP9Ik4D9yfN7AIXyV-p6vOGEs8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "412464647081-uv79mu9cqm0tit7il3drhhm9hibqm12p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
