@@ -57,7 +57,6 @@ class _WalletScreenState extends State<WalletScreen> {
             height: 173,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
-                color: Colors.red,
                 image: const DecorationImage(
                     image: AssetImage(AppImages.walletCard),
                     fit: BoxFit.cover)),

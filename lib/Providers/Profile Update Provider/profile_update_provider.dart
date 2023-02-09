@@ -19,6 +19,7 @@ class ProfileUpdateProvider extends ChangeNotifier {
       print("response status is $response");
       if (response.data['status'] == true) {
         final res = UserData.fromJson(response.data['data']);
+        print("mobile number on response => ${res.mobile}");
         print("address data from response => ${response.data['data']}");
         await sqliteDb.updateUserData(res);
         popUp(

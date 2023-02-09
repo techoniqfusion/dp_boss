@@ -29,7 +29,7 @@ class UserData {
   UserData.fromJson(Map<String, dynamic> json) {
     email = json['email'];
     name = json['name'];
-    mobile = json['mobile '];
+    mobile = json['mobile'];
     address = json['address'];
     gender = json['gender'];
     dob = json['dob'];
@@ -45,7 +45,7 @@ class UserData {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['email'] = email;
     data['name'] = name;
-    data['mobile '] = mobile;
+    data['mobile'] = mobile;
     data['address'] = address;
     data['gender'] = gender;
     data['dob'] = dob;

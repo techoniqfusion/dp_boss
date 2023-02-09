@@ -1,13 +1,19 @@
+import 'package:dio/dio.dart';
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:dp_boss/Component/custom_textfield.dart';
 import 'package:dp_boss/utils/app_font.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import '../../Component/custom_button.dart';
 import '../../Component/icon_card.dart';
+import '../../Component/pop_up.dart';
+import '../../Providers/Verificartion Provider/verification_provider.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_images.dart';
 import '../../utils/app_size.dart';
@@ -22,14 +28,15 @@ class VerifyScreen extends StatefulWidget {
 class _VerifyScreenState extends State<VerifyScreen> {
   int currentStep = 0;
   var aadhaarNoController = TextEditingController();
+  var panNoController = TextEditingController();
   bool isCompleted = false; //check completeness of inputs
+
   final formKey =
       GlobalKey<FormState>(); //form object to be used for form validation
+  final form2Key = GlobalKey<FormState>();
 
   File? panFrontImg;
   XFile? panFrontImgFile;
-  File? panBackImg;
-  XFile? panBackImgFile;
   File? aadhaarFrontImg;
   XFile? aadhaarFrontImgFile;
   File? aadhaarBackImg;
@@ -53,7 +60,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
     if (await Permission.camera.isGranted) {
       if (await Permission.storage.isGranted) {
         selfieImgFile = await picker.pickImage(
-            source: ImageSource.camera, imageQuality: 20);
+            source: ImageSource.camera,
+            imageQuality: 20,
+            preferredCameraDevice: CameraDevice.front);
         if (selfieImgFile != null) {
           setState(() {
             selfieImg = File(selfieImgFile!.path);
@@ -76,7 +85,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 actions: <Widget>[
                   CustomButton(
                     backgroundColor:
-                    MaterialStateProperty.all<Color>(AppColor.lightYellow),
+                        MaterialStateProperty.all<Color>(AppColor.lightYellow),
                     textColor: AppColor.white,
                     buttonText: 'Allow',
                     onPressed: () async {
@@ -86,7 +95,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                   ),
                   CustomButton(
                     backgroundColor:
-                    MaterialStateProperty.all<Color>(AppColor.lightYellow),
+                        MaterialStateProperty.all<Color>(AppColor.lightYellow),
                     textColor: AppColor.white,
                     buttonText: 'Cancel',
                     onPressed: () async {
@@ -123,14 +132,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
               panFrontImg = File(panFrontImgFile!.path);
             });
           }
-        } else if (key == "pan_back") {
-          panBackImgFile = await picker.pickImage(
-              source: ImageSource.gallery, imageQuality: 20);
-          if (panBackImgFile != null) {
-            setState(() {
-              panBackImg = File(panBackImgFile!.path);
-            });
-          }
         } else if (key == "aadhar_front") {
           aadhaarFrontImgFile = await picker.pickImage(
               source: ImageSource.gallery, imageQuality: 20);
@@ -142,7 +143,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
         } else if (key == "aadhar_back") {
           aadhaarBackImgFile = await picker.pickImage(
               source: ImageSource.gallery, imageQuality: 20);
-          if (aadhaarFrontImgFile != null) {
+          if (aadhaarBackImgFile != null) {
             setState(() {
               aadhaarBackImg = File(aadhaarBackImgFile!.path);
             });
@@ -189,8 +190,25 @@ class _VerifyScreenState extends State<VerifyScreen> {
     }
   }
 
+  String? validatePan(String? value) {
+    if (value!.isEmpty) {
+      return "Required";
+    } else if (!RegExp("^([A-Z]){5}([0-9]){4}([A-Z]){1}?\$").hasMatch(value)) {
+      return "Invalid PAN Number";
+    }
+    return null;
+  }
+
+  String? validateAadhaar(String? value) {
+    if (value!.isEmpty) {
+      return "Required";
+    } else if (value.length != 12) return "Invalid Aadhaar Number";
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<VerificationProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -208,67 +226,144 @@ class _VerifyScreenState extends State<VerifyScreen> {
               Navigator.pop(context);
             }),
       ),
-      body: Form(
-        key: formKey,
-        child: Stepper(
-          elevation: 0,
-          steps: getSteps(),
-          type: StepperType.horizontal,
-          currentStep: currentStep,
-          // onStepTapped: (step) {
-          //   formKey.currentState!.validate(); //this will trigger validation
-          //   setState(() {
-          //     currentStep = step;
-          //   });
-          // },
-          onStepContinue: () {
-            final isLastStep = currentStep == getSteps().length - 1;
-            if (isLastStep) {
-              print("complete");
+      body: Stepper(
+        elevation: 0,
+        steps: getSteps(),
+        type: StepperType.horizontal,
+        currentStep: currentStep,
+        // onStepTapped: (step) {
+        //   formKey.currentState!.validate(); //this will trigger validation
+        //   setState(() {
+        //     currentStep = step;
+        //   });
+        // },
+        onStepContinue: () async {
+          var isValidate = currentStep == 0
+              ? formKey.currentState?.validate()
+              : form2Key.currentState?.validate();
+          print("current step value $currentStep");
+          final isLastStep = currentStep == getSteps().length - 1;
+          if (isLastStep) {
+            print("complete");
+            if (selfieImg == null) {
+              popUp(context: context, title: "Fill All Fields", actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("okay"))
+              ]);
+            } else {
+              String? aadhaarFrontFileName;
+              String? aadhaarBackFileName;
+              String? panCardFileName;
+              String? selfieFileName;
+              if (aadhaarFrontImg != null &&
+                  aadhaarBackImg != null &&
+                  panFrontImg != null &&
+                  selfieImg != null) {
+                aadhaarFrontFileName = aadhaarFrontImg?.path.split('/').last;
+                aadhaarBackFileName = aadhaarBackImg?.path.split('/').last;
+                panCardFileName = panFrontImg?.path.split('/').last;
+                selfieFileName = selfieImg?.path.split('/').last;
+                var formData = FormData.fromMap({
+                  "aadhar_card_number": aadhaarNoController.text,
+                  "aadhar_card_front": await MultipartFile.fromFile(
+                      aadhaarFrontImg!.path,
+                      filename: aadhaarFrontFileName),
+                  "aadhar_card_back": await MultipartFile.fromFile(
+                      aadhaarBackImg!.path,
+                      filename: aadhaarBackFileName),
+                  "pan_card_number": panNoController.text,
+                  "pan_card_front": await MultipartFile.fromFile(
+                      panFrontImg!.path,
+                      filename: panCardFileName),
+                  "user_selfie": await MultipartFile.fromFile(selfieImg!.path,
+                      filename: selfieFileName)
+                });
+                final response = await provider.verification(context, formData);
+                if (response.data['status'] == 200) {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                        title: Text(
+                          response.data['mess'],
+                          textAlign: TextAlign.center,
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("okay"),
+                          ),
+                        ]),
+                  );
+                  setState(() {});
+                }
+              }
             }
-            // else if (aadhaarFrontImg == null &&
-            //     aadhaarBackImg == null &&
-            //     aadhaarNoController.text.isEmpty) {
-            //   popUp(context: context, title: "Fill All Fields", actions: [
-            //     TextButton(
-            //         onPressed: () {
-            //           Navigator.pop(context);
-            //         },
-            //         child: Text("okay"))
-            //   ]);
-            // }
-            else {
-              setState(() {
-                currentStep += 1;
-              });
-            }
-          },
-          onStepCancel: currentStep == 0
-              ? null
-              : () {
-                  setState(() {
-                    currentStep -= 1;
-                  });
-                },
-          controlsBuilder: controlBuilder,
-        ),
+          } else if (currentStep == 0 &&
+                  (aadhaarFrontImg == null ||
+                      aadhaarBackImg == null ||
+                      aadhaarNoController.text.isEmpty) ||
+              currentStep == 1 &&
+                  (panFrontImg == null || panNoController.text.isEmpty)) {
+            popUp(context: context, title: "Fill All Fields", actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("okay"))
+            ]);
+          } else if (isValidate != null && !isValidate && currentStep == 0) {
+            popUp(context: context, title: "Invalid Aadhaar Number", actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("okay"))
+            ]);
+          } else if (isValidate != null && !isValidate && currentStep == 1) {
+            popUp(context: context, title: "Invalid PAN Number", actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("okay"))
+            ]);
+          } else {
+            print("is last step $isLastStep");
+            setState(() {
+              currentStep += 1;
+            });
+            print("after on tap ${currentStep}");
+          }
+        },
+        onStepCancel: currentStep == 0
+            ? null
+            : () {
+                setState(() {
+                  currentStep -= 1;
+                });
+              },
+        controlsBuilder: controlBuilder,
       ),
     );
   }
 
-  Widget controlBuilder(context, details) {
-    final isLastStep = currentStep == getSteps().length - 1;
+  Widget controlBuilder(BuildContext context, details) {
+    // final isLastStep = currentStep == getSteps().length - 1;
     return Row(
       children: [
-        Visibility(
-          visible: !isLastStep,
-          child: CustomButton(
-            height: 18,
-            onPressed: details.onStepContinue,
-            buttonText: "Continue",
-            backgroundColor:
-                MaterialStateProperty.all<Color>(AppColor.lightYellow),
-          ),
+        CustomButton(
+          isLoading: context.watch<VerificationProvider>().buttonLoader,
+          height: 18,
+          onPressed: details.onStepContinue,
+          buttonText: "Continue",
+          backgroundColor:
+              MaterialStateProperty.all<Color>(AppColor.lightYellow),
         ),
         SizedBox(
           width: 10,
@@ -295,10 +390,21 @@ class _VerifyScreenState extends State<VerifyScreen> {
           isActive: currentStep >= 0,
           content: Column(
             children: [
-              CustomTextField(
-                keyboardType: TextInputType.multiline,
-                hintText: "Enter Aadhaar Card Number",
-                hintStyle: TextStyle(color: Colors.grey),
+              Form(
+                key: formKey,
+                child: CustomTextField(
+                  controller: aadhaarNoController,
+                  validator: validateAadhaar,
+                  maxLength: 12,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r"\d"), // allow only numbers
+                    )
+                  ],
+                  keyboardType: TextInputType.number,
+                  hintText: "Enter Aadhaar Card Number",
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
               ),
               SizedBox(
                 height: 20,
@@ -454,10 +560,20 @@ class _VerifyScreenState extends State<VerifyScreen> {
             isActive: currentStep >= 1,
             content: Column(
               children: [
-                CustomTextField(
-                  keyboardType: TextInputType.multiline,
-                  hintText: "Enter PAN Card Number",
-                  hintStyle: TextStyle(color: Colors.grey),
+                Form(
+                  key: form2Key,
+                  child: CustomTextField(
+                    controller: panNoController,
+                    validator: validatePan,
+                    textCapitalization: TextCapitalization.characters,
+                    maxLength: 10,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp("[0-9A-Z]"))
+                    ],
+                    // keyboardType: TextInputType.streetAddress,
+                    hintText: "Enter PAN Card Number",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
                 ),
                 SizedBox(
                   height: 20,
@@ -533,84 +649,14 @@ class _VerifyScreenState extends State<VerifyScreen> {
                       ),
                 SizedBox(
                   height: 20,
-                ),
-                panBackImg != null
-                    ? Stack(
-                        children: [
-                          Container(
-                            height: 100,
-                            width: AppSize.getWidth(context),
-                            clipBehavior: Clip.hardEdge,
-                            margin: EdgeInsets.all(15.0),
-                            decoration: BoxDecoration(
-                                // shape: BoxShape.circle,
-                                borderRadius: BorderRadius.circular(6.0)),
-                            child: Image.file(
-                              panBackImg!,
-                              // File(image?.path),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: IconButton(
-                                onPressed: () {
-                                  panBackImg = null;
-                                  setState(() {});
-                                },
-                                icon: Icon(
-                                  Icons.clear,
-                                  color: AppColor.black,
-                                )),
-                          )
-                        ],
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          openGallery(key: "pan_back");
-                        },
-                        child: DottedBorder(
-                          //borderPadding: EdgeInsets.symmetric(horizontal: 10),
-                          borderType: BorderType.RRect,
-                          dashPattern: [7, 5, 0, 0],
-                          radius: const Radius.circular(12),
-                          //padding: EdgeInsets.all(6),
-                          child: Container(
-                              height: 100,
-                              width: AppSize.getWidth(context),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    height: 32,
-                                    width: 32,
-                                    decoration: BoxDecoration(
-                                      color: AppColor.white,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Center(
-                                        child: Text(
-                                      "+",
-                                      style: TextStyle(color: Colors.black),
-                                    )),
-                                  ),
-                                  Text(
-                                    "Upload Pan Card Back Side",
-                                    style: TextStyle(color: Colors.black),
-                                  )
-                                ],
-                              )),
-                        ),
-                      ),
-                SizedBox(
-                  height: 20,
                 )
               ],
             )),
         Step(
             title: const Text("User Selfie"),
-            state: currentStep > 2 ? StepState.complete : StepState.indexed,
+            state: selfieImg != null && currentStep >= 2
+                ? StepState.complete
+                : StepState.indexed,
             isActive: currentStep >= 2,
             content: Column(
               children: [

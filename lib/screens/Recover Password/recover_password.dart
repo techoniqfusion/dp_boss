@@ -39,7 +39,7 @@ class _RecoverPasswordState extends State<RecoverPassword> {
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 15),
         child: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          // autovalidateMode: AutovalidateMode.onUserInteraction,
           key: formKey,
           child: Column(
             children: [

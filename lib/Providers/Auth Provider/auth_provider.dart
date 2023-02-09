@@ -47,11 +47,11 @@ class AuthProvider extends ChangeNotifier {
     try{
       updateLoader(true);
       final response = await appAPi.loginAPI(body: body);
-      // await Dio().post("${Endpoints.baseUrl}login/login-user", data: body);
       if (response.data['status_code'] == 200){
         await prefs.setBool("isLoggedIn", true);
         await prefs.setString("userToken", response.data['token']);
         final users = UserData.fromJson(response.data['data']);
+        
         await sqliteDb.addToUser(users);
         updateLoader(false);
         Navigator.popAndPushNamed(context, AppScreen.dashboard);

@@ -84,7 +84,7 @@ class _RegistrationState extends State<Registration> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          // autovalidateMode: AutovalidateMode.onUserInteraction,
           key: formKey,
           child: Column(
             children: [

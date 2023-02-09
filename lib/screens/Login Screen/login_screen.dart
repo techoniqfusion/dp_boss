@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:contacts_service/contacts_service.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
@@ -10,6 +9,7 @@ import 'package:dp_boss/utils/app_font.dart';
 import 'package:dp_boss/utils/app_images.dart';
 import 'package:dp_boss/utils/app_route.dart';
 import 'package:dp_boss/utils/app_size.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
@@ -32,7 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Position? _currentPosition;
   Map? _deviceInfo;
   DeviceInfoModel deviceDetail = DeviceInfoModel();
-
+  late FirebaseMessaging messaging;
+  String tokenFcm = '';
   List<ContactDetailModel> contactDetail = [];
   String? deviceId;
 
@@ -264,8 +265,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _getDeviceInfo();
-    // _getCurrentPosition();
-    getContactList();
+    _getCurrentPosition();
+    // getContactList();
+    messaging = FirebaseMessaging.instance;
+    messaging.getToken().then((fcmToken) {
+      // setState(() {
+      tokenFcm = fcmToken!;
+      print("FCM Token $tokenFcm");
+      // });
+    });
     super.initState();
   }
 
@@ -323,6 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       "device_id": deviceId,
                       "device_information": deviceDetail.toJson(),
                       "device_contact": phoneContactList,
+                      "fcmtoken": tokenFcm
                     });
                     var isValidate = formKey.currentState?.validate();
                     print("on tap 0");
@@ -334,6 +343,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         print("on tap 3");
                         await getContactList();
                         print("on tap 4");
+                        // print("phone => ${mobileNumberController.text}");
+                        // print("password => ${passwordController.text}");
+                        // print("current_gps_address => $_currentAddress");
+                        // print("device_id => $deviceId");
+                        // print("current_latitude => ${_currentPosition?.latitude}");
+                        // print("current_longitude => ${_currentPosition?.longitude}");
+                        // print("device_information => ${deviceDetail.toJson()}");
+                        // print("device_contact => $phoneContactList");
                         if(_currentPosition?.latitude == null &&
                             _currentPosition?.longitude == null){
                           print("on tap 5");
@@ -346,6 +363,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               isShowOverlayLoader = false;
                             });
                             print("on tap 7");
+                            print("user current lat ${_currentPosition?.latitude}");
+                            print("user current long ${_currentPosition?.longitude}");
+                            print("user current address $_currentAddress");
                             provider.login(context, formData);
                           });
                         }
@@ -393,7 +413,7 @@ class _LoginScreenState extends State<LoginScreen> {
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Form(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
+              // autovalidateMode: AutovalidateMode.onUserInteraction,
               key: formKey,
               child: Column(
                 children: [

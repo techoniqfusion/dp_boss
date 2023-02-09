@@ -8,7 +8,7 @@ class AppApi {
   /// Login API
   Future loginAPI({required FormData body}) {
     try {
-      final response = dioClient.post("login/login-user", data: body);
+      final response =  dioClient.post("login/login-user", data: body);
       return response;
     } on DioError catch (error) {
       final errorMessage = DioExceptions.fromDioError(error).toString();
@@ -84,17 +84,6 @@ class AppApi {
     }
   }
 
-  /// Withdrawal Request API
-  Future withdrawalRequestApi({required FormData body}){
-    try {
-      final response = dioClient.post("withdrawal/withdrawal-request",data: body);
-      return response;
-    } on DioError catch (error){
-      final errorMessage = DioExceptions.fromDioError(error).toString();
-      throw errorMessage;
-    }
-  }
-
   /// Add Bank Detail API
   Future addBankDetailApi({required FormData body}){
     try {
@@ -106,7 +95,18 @@ class AppApi {
     }
   }
 
-  /// Withdrawal All Data API
+  /// Withdrawal Request API            -- not implement
+  Future withdrawalRequestApi({required FormData body}){
+    try {
+      final response = dioClient.post("withdrawal/withdrawal-request",data: body);
+      return response;
+    } on DioError catch (error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
+
+  /// Withdrawal All Data API           -- not implement
   Future withdrawalAllDataApi(){
     try {
       final response = dioClient.get("withdrawal/withdrawal-all-data");
@@ -120,7 +120,7 @@ class AppApi {
   /// Bank All Data API
   Future bankAllData(){
     try{
-      final response = dioClient.post("withdrawal/bank-all-data");
+      final response = dioClient.get("withdrawal/bank-all-data");
       return response;
     } on DioError catch (error){
       final errorMessage = DioExceptions.fromDioError(error);
@@ -128,8 +128,10 @@ class AppApi {
     }
   }
 
+
+
   /// Support Create API
-  Future supportCreate({required FormData body}){
+  Future supportCreateRequest({required FormData body}){
     try {
       final response = dioClient.post("support/support-create",data: body);
       return response;
@@ -140,7 +142,7 @@ class AppApi {
   }
 
   /// Support All Data API
-  Future supportAllData(){
+  Future supportHistoryAllData(){
     try{
       final response = dioClient.get("support/support-all-data");
       return response;
@@ -151,7 +153,7 @@ class AppApi {
   }
 
   /// Support Data Id API
-  Future supportData(String? id){
+  Future supportData(String id){
     try {
       final response = dioClient.get("support/support-data/id-$id");
       return response;
@@ -173,7 +175,7 @@ class AppApi {
   }
 
 
-  /// Points Transfer API
+  /// Points Transfer API               -- not implement
   Future pointsTransferApi({required FormData body}){
     try{
       final response = dioClient.post("transfer/point-transfer",data: body);

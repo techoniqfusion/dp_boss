@@ -24,6 +24,18 @@ class _ProfileViewState extends State<ProfileView> {
   String userName = "";
   String userEmail = "";
 
+  @override
+  void initState() {
+    super.initState();
+    // setState(() {
+    getUserData()
+        .then((value) => {if (value != null){
+          userName = value.name,
+          userEmail = value.email
+    }});
+    // });
+  }
+
   Future getUserData() async {
     await sqliteDb.openDB();
     try {
@@ -41,6 +53,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    print("user name $userName");
     var fontStyle =  const TextStyle(
         color: AppColor.black,fontSize: 14,
         fontFamily: AppFont.poppinsMedium);
@@ -98,7 +111,9 @@ class _ProfileViewState extends State<ProfileView> {
             listTile(
                 title: Text("Refer & Earn",style: fontStyle,),
                 leading: Image.asset(AppImages.referEarnIcon,height: 40),
-                onPressed: (){}),
+                onPressed: (){
+                  Navigator.pushNamed(context, AppScreen.referAndEarn);
+                }),
             listTile(
               title: Row(
                 children: [
@@ -118,6 +133,27 @@ class _ProfileViewState extends State<ProfileView> {
                 Navigator.pushNamed(context, AppScreen.verifyScreen);
               }
             ),
+
+            listTile(
+                title: Row(
+                  children: [
+                    iconCard(
+                        icon: Icon(Icons.help,color: Colors.white,),
+                        height: 40,width: 40,
+                        radius: 15
+                    ),
+                    SizedBox(width: 18,),
+                    Text("Help & Support", style: const TextStyle(
+                        color: AppColor.black,fontSize: 14,
+                        fontFamily: AppFont.poppinsMedium
+                    ),)
+                  ],
+                ),
+                onPressed: (){
+                  Navigator.pushNamed(context, AppScreen.helpAndSupport);
+                }
+            ),
+
             listTile(
                 title: Text("Logout",style: fontStyle,),
                 leading: Image.asset(AppImages.logOutIcon,height: 40),

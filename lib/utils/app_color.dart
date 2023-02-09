@@ -15,7 +15,9 @@ class AppColor{
   static const neon = Color(0xff50E37A);
   static const cherry = Color(0xffFB6B6B);
   static const lightYellow2 = Color(0xffFEEBA6);
-
+  static const darkGrey = Color(0xff434343);
+  static const customWhite = Color(0xffF5F5F5);
+  static const green = Color(0xff28a745);
 
   static const Gradient yellowGradient = LinearGradient(
     colors: [lightYellow, yellow1],

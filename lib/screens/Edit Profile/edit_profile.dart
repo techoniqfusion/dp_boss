@@ -6,9 +6,11 @@ import 'package:dp_boss/Component/custom_textfield.dart';
 import 'package:dp_boss/Component/icon_card.dart';
 import 'package:dp_boss/utils/app_font.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../API Response Model/Registration Model/registration_model.dart';
 import '../../Component/custom_dropdown.dart';
 import '../../Component/custom_loader.dart';
@@ -54,9 +56,10 @@ class _EditProfileState extends State<EditProfile> {
     selectStateData();
     getUserData().then((value) => {
           fullNameController.text = value.name,
-          emailController.text = value.email,
-          dobController.text = value.dob,
-          addressController.text = value.address,
+          // emailController.text = value.email,
+          // dobController.text = value.dob,
+          // addressController.text = value.address,
+          mobileNumberController.text = value.mobile
         });
     super.initState();
   }
@@ -105,9 +108,11 @@ class _EditProfileState extends State<EditProfile> {
     await sqliteDb.openDB();
     try {
       List list = await sqliteDb.getUser();
+      print("user data => $list");
       final data = UserData.fromJson(list.first);
-      print("user data address => ${data.address}");
-      print("user data email => ${data.email}");
+      // print("user data address => ${data.address}");
+      // print("user data email => ${data.email}");
+      // print("user data mobile => ${data.mobile}");
       return data;
     } catch (e) {
       print(e);
@@ -124,6 +129,9 @@ class _EditProfileState extends State<EditProfile> {
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
         child: CustomButton(
             onPressed: () async {
+              // SharedPreferences prefs = await SharedPreferences.getInstance();
+              // var authToken = prefs.getString("userToken");
+              // print("user token ${authToken}");
               var isValidate = formKey.currentState?.validate();
               if (isValidate != null && isValidate == true) {
                 var formData = FormData.fromMap({
@@ -167,6 +175,20 @@ class _EditProfileState extends State<EditProfile> {
               print("get user data is ${snapshot.data}");
               var data = snapshot.data as UserData;
 
+              print("mobile number => ${data.mobile}");
+
+              if(data.email != null && data.email != "null"){
+                emailController.text = data.email.toString();
+              }
+
+              if(data.dob != null && data.dob != "null"){
+                dobController.text = data.dob.toString();
+              }
+
+              if(data.address != null && data.address != "null"){
+                addressController.text = data.address.toString();
+              }
+
               if (data.gender != null && data.gender != "null") {
                 selectedGender = data.gender;
               }
@@ -177,8 +199,12 @@ class _EditProfileState extends State<EditProfile> {
               if (data.state != null && data.state != "null") {
                 print("selected state val is ${data.state}");
                 selectedState = data.state;
+                selectedStateIndex = newStateData.indexWhere(
+                        (val) => val.state == selectedState);
+                cityData = newStateData[selectedStateIndex].districts!;
               }
-
+              // print("selected state data  $newStateData");
+              // print("selected city data  $cityData");
               return Form(
                 key: formKey,
                 // autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -195,6 +221,8 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                     textHeading(text: "Name"),
                     CustomTextField(
+                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z]+|\s")),],
+                      keyboardType: TextInputType.text,
                       controller: fullNameController,
                       validator: validate,
                       horizontalContentPadding: 30,
@@ -216,7 +244,7 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                     textHeading(text: "Mobile"),
                     CustomTextField(
-                      controller: mobileNumberController..text = data.mobile ?? "",
+                      controller: mobileNumberController,
                       readOnly: true,
                       horizontalContentPadding: 30,
                       hintText: "Enter Mobile Number",
@@ -229,7 +257,7 @@ class _EditProfileState extends State<EditProfile> {
                     /// Select Gender Dropdown
                     StatefulBuilder(builder: (context, setDropDown) {
                       return CustomDropdown(
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        // autovalidateMode: AutovalidateMode.onUserInteraction,
                         hint: const Text("select gender"),
                         validator: (value) =>
                             value == null ? "Select gender" : null,
@@ -273,6 +301,7 @@ class _EditProfileState extends State<EditProfile> {
                     CustomTextField(
                       validator: validate,
                       controller: addressController,
+                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z\d]+|\s")),],
                       // verticalContentPadding: 10,
                       keyboardType: TextInputType.multiline,
                       horizontalContentPadding: 30,
@@ -290,8 +319,8 @@ class _EditProfileState extends State<EditProfile> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CustomDropdown(
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            // autovalidateMode:
+                            //     AutovalidateMode.onUserInteraction,
                             hint: const Text("choose state"),
                             validator: (value) {
                               if (value == null) {
@@ -301,7 +330,7 @@ class _EditProfileState extends State<EditProfile> {
                             },
                             value: selectedState,
                             onChanged: (val) {
-                              setState(() {
+                              setDropDown(() {
                                 selectedState = val.toString();
                                 selectedStateIndex = newStateData.indexWhere(
                                     (val) => val.state == selectedState);
@@ -329,20 +358,20 @@ class _EditProfileState extends State<EditProfile> {
                           ),
                           textHeading(text: "Select City"),
                           CustomDropdown(
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            // autovalidateMode:
+                            //     AutovalidateMode.onUserInteraction,
                             hint: const Text("choose city"),
                             validator: (value) =>
                                 value == null ? "Select City" : null,
                             value: selectedCity,
-                            onChanged: (val) {
+                            onChanged: selectedState != null ? (val) {
                               setDropDown(() {
                                 selectedCity = val.toString();
                               });
                               print("selected city $selectedCity");
-                            },
-                            items: selectedState != null
-                                ? cityData.map((item) {
+
+                            } : null,
+                            items: cityData.map((item) {
                                     // print('city list $item');
                                     return DropdownMenuItem<String>(
                                       value: item,
@@ -354,7 +383,6 @@ class _EditProfileState extends State<EditProfile> {
                                       ),
                                     );
                                   }).toList()
-                                : [],
                           )
                         ],
                       );
@@ -381,9 +409,9 @@ class _EditProfileState extends State<EditProfile> {
     DateTime selectedDate = DateTime.now();
     final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1900),
-        lastDate: DateTime.now(),
+        initialDate: DateTime(selectedDate.year - 18),
+        firstDate: DateTime(selectedDate.year - 75),
+        lastDate: DateTime(selectedDate.year - 18),
         builder: (context, child) {
           return Theme(
             data: Theme.of(context).copyWith(

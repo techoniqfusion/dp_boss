@@ -14,7 +14,7 @@ class AddBankDetailsProvider extends ChangeNotifier {
       final response = await appAPi.addBankDetailApi(body: body);
       if (response.data['status'] == 200) {
         popUp(
-            context: context, title: response.data['mess'],
+            context: context, title: response.data['message'],
           actions: [
             TextButton(
               onPressed: () {
@@ -56,6 +56,7 @@ class AddBankDetailsProvider extends ChangeNotifier {
           );
         }
       }
+      return response.data;
     } catch (error) {
       print("Add Bank Details API error $error");
       rethrow;

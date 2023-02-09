@@ -45,7 +45,6 @@ class DioClient {
         ProgressCallback? onReceiveProgress,
       }) async {
     print("argument data url is $url");
-    print("argument data is $data");
     try {
       final Response response = await dio.post(
         url,
@@ -56,9 +55,10 @@ class DioClient {
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
+      // print("post function response is $response");
       return response;
     } catch (e) {
-      print("post function response is $e");
+      print("post function catch error is $e");
       rethrow;
     }
   }
