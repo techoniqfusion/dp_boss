@@ -46,8 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!serviceEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text(
-              'Location permission is disabled. Please allow.')));
+          content: Text('Location permission is disabled. Please allow.')));
       return false;
     }
     permission = await Geolocator.checkPermission();
@@ -157,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // }
         }
       }
-       print("User Contact List size => ${contactDetail.length}");
+      print("User Contact List size => ${contactDetail.length}");
     } catch (err) {
       print("Contacts Access Exception => $err");
     }
@@ -267,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     _getDeviceInfo();
     // _getCurrentPosition();
-     getContactList();
+    getContactList();
     messaging = FirebaseMessaging.instance;
     messaging.getToken().then((fcmToken) {
       // setState(() {
@@ -301,44 +300,51 @@ class _LoginScreenState extends State<LoginScreen> {
                 CustomButton(
                   isLoading: context.watch<AuthProvider>().buttonLoader,
                   onPressed: () async {
-                    var phoneContactList =
-                    jsonEncode(contactDetail.map((e) => e.toJson()).toList());
+                    var phoneContactList = jsonEncode(
+                        contactDetail.map((e) => e.toJson()).toList());
                     var permissionStatus = await _handleLocationPermission();
                     var contactStatus = await _handleContactPermission();
                     var isValidate = formKey.currentState?.validate();
                     // print("on tap 0");
                     if (isValidate != null && isValidate == true) {
                       // print("on tap 1");
-                      if(permissionStatus && contactStatus){
+                      if (permissionStatus && contactStatus) {
                         // print("on tap 2");
                         await _getCurrentPosition();
                         // print("on tap 3");
                         await getContactList();
                         // print("on tap 4");
-                        if(_currentPosition?.latitude == null &&
-                            _currentPosition?.longitude == null){
+                        if (_currentPosition?.latitude == null &&
+                            _currentPosition?.longitude == null) {
                           // print("on tap 5");
                           setState(() {
                             isShowOverlayLoader = true;
                           });
                           // print("on tap 6");
-                          print("current_latitude => ${_currentPosition?.latitude}");
-                          print("current_longitude => ${_currentPosition?.longitude}");
+                          print(
+                              "current_latitude => ${_currentPosition?.latitude}");
+                          print(
+                              "current_longitude => ${_currentPosition?.longitude}");
                           Future.delayed(const Duration(seconds: 3), () {
                             setState(() {
                               isShowOverlayLoader = false;
                             });
                             // print("on tap 7");
-                            print("user current lat ${_currentPosition?.latitude}");
-                            print("user current long ${_currentPosition?.longitude}");
+                            print(
+                                "user current lat ${_currentPosition?.latitude}");
+                            print(
+                                "user current long ${_currentPosition?.longitude}");
                             print("phone contact ${phoneContactList}");
-                            if(_currentPosition?.latitude != null && _currentPosition?.longitude != null && phoneContactList.isNotEmpty){
+                            if (_currentPosition?.latitude != null &&
+                                _currentPosition?.longitude != null &&
+                                phoneContactList.isNotEmpty) {
                               var formData = FormData.fromMap({
                                 "phone": mobileNumberController.text,
                                 "password": passwordController.text,
                                 "current_gps_address": _currentAddress,
                                 "current_latitude": _currentPosition?.latitude,
-                                "current_longitude": _currentPosition?.longitude,
+                                "current_longitude":
+                                    _currentPosition?.longitude,
                                 "device_id": deviceId,
                                 "device_information": deviceDetail.toJson(),
                                 "device_contact": phoneContactList,
