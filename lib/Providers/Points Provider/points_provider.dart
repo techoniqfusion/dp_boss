@@ -4,32 +4,20 @@ import '../../API Integration/call_api.dart';
 import '../../Component/pop_up.dart';
 import '../../utils/logout_user.dart';
 
-class AddBankDetailsProvider extends ChangeNotifier {
-  bool isShowLoader = false;
+class PointsTransferProvider extends ChangeNotifier{
+
+  bool buttonLoader = false;
   final appAPi = AppApi();
 
-  Future addBankDetails(BuildContext context, FormData body) async {
+  Future pointsTransfer(BuildContext context, FormData body) async {
     try {
       updateLoader(true);
-      final response = await appAPi.addBankDetailApi(body: body);
-      if (response.data['status'] == 200) {
+      final response = await appAPi.pointsTransferApi(body: body);
+      print("Points Transfer api response ${response.data}");
+      if (response.data['status_code'] == 200) {
         updateLoader(false);
       } else {
-        updateLoader(true);
-        if (response.data['status'] == 401) {
-          popUp(
-            context: context,
-            title: "Session is expired",
-            actions: [
-              TextButton(
-                onPressed: () {
-                  LogOutUser.logout(context);
-                },
-                child: const Text("okay"),
-              ),
-            ],
-          );
-        } else {
+        if (response.data['status_code'] == 201) {
           updateLoader(false);
           popUp(
             context: context,
@@ -44,17 +32,30 @@ class AddBankDetailsProvider extends ChangeNotifier {
             ],
           );
         }
+        if(response.data['status_code'] == 401){
+          popUp(context: context, title: "Session is expired",
+            actions: [
+              TextButton(
+                onPressed: () {
+                  LogOutUser.logout(context);
+                },
+                child: const Text("okay"),
+              ),
+            ],
+          );
+        }
       }
       return response.data;
     } catch (error) {
-      print("Add Bank Details API error $error");
+      print("Points Transfer API error $error");
+      updateLoader(false);
       rethrow;
     }
   }
 
   /// Show/Hide loader functionality
   updateLoader(bool status) {
-    isShowLoader = status;
+    buttonLoader = status;
     notifyListeners();
   }
 }

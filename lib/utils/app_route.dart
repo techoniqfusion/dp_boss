@@ -1,4 +1,5 @@
 import 'package:dp_boss/screens/Add%20Bank%20Account/add_bank_account.dart';
+import 'package:dp_boss/screens/Add%20UPI%20Screen/add_upi_screen.dart';
 import 'package:dp_boss/screens/Change%20Password%20Screen/change_password_screen.dart';
 import 'package:dp_boss/screens/Create%20Request/create_request.dart';
 import 'package:dp_boss/screens/Dashboard/dashboard.dart';
@@ -6,6 +7,7 @@ import 'package:dp_boss/screens/Edit%20Profile/edit_profile.dart';
 import 'package:dp_boss/screens/Help%20&%20Support/help_and_support.dart';
 import 'package:dp_boss/screens/Notification%20Screen/notification.dart';
 import 'package:dp_boss/screens/OTP%20Screen/otp_screen.dart';
+import 'package:dp_boss/screens/Points%20Screen/points_screen.dart';
 import 'package:dp_boss/screens/Recover%20Password/recover_password.dart';
 import 'package:dp_boss/screens/Refer%20and%20Earn/refer_and_earn.dart';
 import 'package:dp_boss/screens/Registration%20Screen/registration.dart';
@@ -52,6 +54,14 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const HelpAndSupport());
       case AppScreen.createRequest:
         return MaterialPageRoute(builder: (_) => const CreateRequest());
+      case AppScreen.pointsScreen:
+        return MaterialPageRoute(builder: (_) => PointsScreen());
+      case AppScreen.addUpiScreen:
+        var arguments = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(builder: (_) => AddUPI(
+          upiType: arguments['upiType'],
+          upiId: arguments['upiId'],
+        ));
       case AppScreen.chatScreen:
         var arguments = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
@@ -99,4 +109,6 @@ class AppScreen {
   static const String helpAndSupport = "helpAndSupport";
   static const String createRequest = "createRequest";
   static const String chatScreen = "chatScreen";
+  static const String pointsScreen = "pointsScreen";
+  static const String addUpiScreen = "addUpiScreen";
 }

@@ -5,8 +5,8 @@ import '../utils/app_color.dart';
 import '../utils/app_images.dart';
 
 class SelectDateBox extends StatefulWidget {
-    String? chooseDate;
-    SelectDateBox({Key? key, required this.chooseDate}) : super(key: key);
+  String? chooseDate;
+  SelectDateBox({Key? key, required this.chooseDate}) : super(key: key);
 
   @override
   State<SelectDateBox> createState() => _SelectDateBoxState();
@@ -23,13 +23,17 @@ class _SelectDateBoxState extends State<SelectDateBox> {
         gradient: AppColor.yellowGradient2,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(widget.chooseDate == null ? "select date" :"${widget.chooseDate}".split(' ')[0],style: const TextStyle(
-            color: AppColor.black
-          ),),
+          Text(
+            widget.chooseDate == null
+                ? "select date"
+                : "${widget.chooseDate}".split(' ')[0],
+            style: const TextStyle(color: AppColor.black),
+          ),
           InkWell(
-              onTap: (){
+              onTap: () {
                 _selectDate(context);
               },
               child: SvgPicture.asset(AppImages.calendarIcon))
@@ -62,8 +66,8 @@ class _SelectDateBoxState extends State<SelectDateBox> {
               // ),
             ),
             child: child!,
-          );}
-    );
+          );
+        });
     if (picked != null && picked != selectedDate) {
       setState(() {
         String formattedDate = DateFormat('dd-MM-yyyy').format(picked);

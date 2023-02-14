@@ -29,7 +29,7 @@ class _ProfileViewState extends State<ProfileView> {
     super.initState();
     // setState(() {
     getUserData()
-        .then((value) => {if (value != null){
+        .then((value) => {if (value != null && value != "null"){
           userName = value.name,
           userEmail = value.email
     }});
@@ -54,6 +54,7 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     print("user name $userName");
+    print("user name $userEmail");
     var fontStyle =  const TextStyle(
         color: AppColor.black,fontSize: 14,
         fontFamily: AppFont.poppinsMedium);
@@ -76,14 +77,14 @@ class _ProfileViewState extends State<ProfileView> {
               child:
               ClipRRect(
                   borderRadius: BorderRadius.circular(42),
-                  child: Image.network("https://p6.focus.de/img/fotos/id_3802741/dan-bilzerian.jpg?im=Resize%3D%28800%2C780%29&impolicy=perceptual&quality=medium&hash=bcb85e52e3f7433b790bd2a11dac4d6f42b7896e72164ee791299bd438d4ab8e")),
+                  child: Image.asset(AppImages.avatar)),
             ),
             SizedBox(height: 10,),
             Text(userName,style: TextStyle(
               color: AppColor.black,fontSize: 14,
               fontFamily: AppFont.poppinsSemiBold
             ),),
-            Text(userEmail,style: TextStyle(
+            Text(userEmail != "null" ? userEmail : "",style: TextStyle(
                 color: AppColor.black.withOpacity(0.9),fontSize: 14,
                 fontFamily: AppFont.poppinsMedium
             ),),
@@ -103,7 +104,6 @@ class _ProfileViewState extends State<ProfileView> {
             Divider(
               color: AppColor.lightYellow,
             ),
-
             listTile(
                 title: Text("Game Rate",style: fontStyle,),
                 leading: Image.asset(AppImages.gameRateIcon,height: 40),

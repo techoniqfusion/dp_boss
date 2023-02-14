@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import '../../model/contact_detail_model.dart';
 import '../../model/device_info_model.dart';
 import '../../utils/app_color.dart';
+import '../../utils/validation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -46,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           behavior: SnackBarBehavior.floating,
           content: Text(
-              'Location services are disabled. Please enable the services')));
+              'Location permission is disabled. Please allow.')));
       return false;
     }
     permission = await Geolocator.checkPermission();
@@ -55,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (permission == LocationPermission.denied) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             behavior: SnackBarBehavior.floating,
-            content: Text('Location permissions are denied')));
+            content: Text('Location permission is denied')));
         return false;
       }
     }
@@ -106,9 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
       // setState(() {
       _currentPosition = position;
       // });
+      // print("current latitude ${_currentPosition?.latitude}");
+      // print("current longitude ${_currentPosition?.longitude}");
       _getAddressFromLatLng(position);
-       print("current latitude ${_currentPosition?.latitude}");
-       print("current longitude ${_currentPosition?.longitude}");
     }).catchError((e) {
       print("get current position error $e");
     });
@@ -265,8 +266,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _getDeviceInfo();
-    _getCurrentPosition();
-    // getContactList();
+    // _getCurrentPosition();
+     getContactList();
     messaging = FirebaseMessaging.instance;
     messaging.getToken().then((fcmToken) {
       // setState(() {
@@ -283,24 +284,6 @@ class _LoginScreenState extends State<LoginScreen> {
     mobileNumberController.dispose();
     passwordController.dispose();
     super.dispose();
-  }
-
-  String? validatePass(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length < 6) {
-      return "Should at least 6 characters";
-    }
-    return null;
-  }
-
-  String? validateMobile(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length < 10) {
-      return "Invalid Mobile Number";
-    }
-    return null;
   }
 
   bool isShowOverlayLoader = false;
@@ -322,55 +305,49 @@ class _LoginScreenState extends State<LoginScreen> {
                     jsonEncode(contactDetail.map((e) => e.toJson()).toList());
                     var permissionStatus = await _handleLocationPermission();
                     var contactStatus = await _handleContactPermission();
-                    var formData = FormData.fromMap({
-                      "phone": mobileNumberController.text,
-                      "password": passwordController.text,
-                      "current_gps_address": _currentAddress,
-                      "current_latitude": _currentPosition?.latitude,
-                      "current_longitude": _currentPosition?.longitude,
-                      "device_id": deviceId,
-                      "device_information": deviceDetail.toJson(),
-                      "device_contact": phoneContactList,
-                      "fcmtoken": tokenFcm
-                    });
                     var isValidate = formKey.currentState?.validate();
-                    print("on tap 0");
+                    // print("on tap 0");
                     if (isValidate != null && isValidate == true) {
-                      print("on tap 1");
+                      // print("on tap 1");
                       if(permissionStatus && contactStatus){
-                        print("on tap 2");
+                        // print("on tap 2");
                         await _getCurrentPosition();
-                        print("on tap 3");
+                        // print("on tap 3");
                         await getContactList();
-                        print("on tap 4");
-                        // print("phone => ${mobileNumberController.text}");
-                        // print("password => ${passwordController.text}");
-                        // print("current_gps_address => $_currentAddress");
-                        // print("device_id => $deviceId");
-                        // print("current_latitude => ${_currentPosition?.latitude}");
-                        // print("current_longitude => ${_currentPosition?.longitude}");
-                        // print("device_information => ${deviceDetail.toJson()}");
-                        // print("device_contact => $phoneContactList");
+                        // print("on tap 4");
                         if(_currentPosition?.latitude == null &&
                             _currentPosition?.longitude == null){
-                          print("on tap 5");
+                          // print("on tap 5");
                           setState(() {
                             isShowOverlayLoader = true;
                           });
-                          print("on tap 6");
+                          // print("on tap 6");
+                          print("current_latitude => ${_currentPosition?.latitude}");
+                          print("current_longitude => ${_currentPosition?.longitude}");
                           Future.delayed(const Duration(seconds: 3), () {
                             setState(() {
                               isShowOverlayLoader = false;
                             });
-                            print("on tap 7");
+                            // print("on tap 7");
                             print("user current lat ${_currentPosition?.latitude}");
                             print("user current long ${_currentPosition?.longitude}");
-                            print("user current address $_currentAddress");
-                            provider.login(context, formData);
+                            print("phone contact ${phoneContactList}");
+                            if(_currentPosition?.latitude != null && _currentPosition?.longitude != null && phoneContactList.isNotEmpty){
+                              var formData = FormData.fromMap({
+                                "phone": mobileNumberController.text,
+                                "password": passwordController.text,
+                                "current_gps_address": _currentAddress,
+                                "current_latitude": _currentPosition?.latitude,
+                                "current_longitude": _currentPosition?.longitude,
+                                "device_id": deviceId,
+                                "device_information": deviceDetail.toJson(),
+                                "device_contact": phoneContactList,
+                                "fcmtoken": tokenFcm
+                              });
+                              provider.login(context, formData);
+                            }
+                            // print("user current address $_currentAddress");
                           });
-                        }
-                        else{
-                          provider.login(context, formData);
                         }
                       }
                     }
@@ -449,7 +426,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 25,
                   ),
                   CustomTextField(
-                    validator: validateMobile,
+                    validator: Validation.validateMobile,
                     hintText: "Enter Mobile Number",
                     onChanged: (val) {
                       // if (val.length == 10) {
@@ -474,7 +451,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: _isObscure,
                       fillColor: AppColor.white,
                       hintText: "Enter Password",
-                      validator: validatePass,
+                      validator: Validation.validatePass,
                       controller: passwordController,
                       suffixIcon: IconButton(
                           icon: Icon(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:dp_boss/utils/validation.dart';
 import 'package:flutter/services.dart' as root_bundle;
 import 'package:dp_boss/Component/custom_button.dart';
 import 'package:dp_boss/Component/custom_textfield.dart';
@@ -10,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../API Response Model/Registration Model/registration_model.dart';
 import '../../Component/custom_dropdown.dart';
 import '../../Component/custom_loader.dart';
@@ -85,24 +85,6 @@ class _EditProfileState extends State<EditProfile> {
     print("state length ${newStateData.length}");
   }
 
-  String? validateEmail(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (!RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(value)) {
-      return "Please enter a valid email address";
-    }
-    return null;
-  }
-
-  String? validate(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    }
-    return null;
-  }
-
   Future getUserData() async {
     print("Call Local dataBase");
     await sqliteDb.openDB();
@@ -172,9 +154,7 @@ class _EditProfileState extends State<EditProfile> {
           future: getUserData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              print("get user data is ${snapshot.data}");
               var data = snapshot.data as UserData;
-
               print("mobile number => ${data.mobile}");
 
               if(data.email != null && data.email != "null"){
@@ -207,7 +187,6 @@ class _EditProfileState extends State<EditProfile> {
               // print("selected city data  $cityData");
               return Form(
                 key: formKey,
-                // autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
                   children: [
@@ -224,7 +203,7 @@ class _EditProfileState extends State<EditProfile> {
                       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z]+|\s")),],
                       keyboardType: TextInputType.text,
                       controller: fullNameController,
-                      validator: validate,
+                      validator: Validation.validate,
                       horizontalContentPadding: 30,
                       hintText: "Enter Full Name",
                     ),
@@ -235,7 +214,7 @@ class _EditProfileState extends State<EditProfile> {
 
                     CustomTextField(
                       controller: emailController,
-                      validator: validateEmail,
+                      validator: Validation.validateEmail,
                       horizontalContentPadding: 30,
                       hintText: "Enter Email",
                     ),
@@ -257,7 +236,6 @@ class _EditProfileState extends State<EditProfile> {
                     /// Select Gender Dropdown
                     StatefulBuilder(builder: (context, setDropDown) {
                       return CustomDropdown(
-                        // autovalidateMode: AutovalidateMode.onUserInteraction,
                         hint: const Text("select gender"),
                         validator: (value) =>
                             value == null ? "Select gender" : null,
@@ -278,7 +256,7 @@ class _EditProfileState extends State<EditProfile> {
                     textHeading(text: "DOB"),
                     CustomTextField(
                       readOnly: true,
-                      validator: validate,
+                      validator: Validation.validate,
                       controller: dobController,
                       horizontalContentPadding: 30,
                       hintText: "Enter DOB",
@@ -299,7 +277,7 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                     textHeading(text: "Address"),
                     CustomTextField(
-                      validator: validate,
+                      validator: Validation.validate,
                       controller: addressController,
                       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z\d]+|\s")),],
                       // verticalContentPadding: 10,
@@ -319,8 +297,6 @@ class _EditProfileState extends State<EditProfile> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CustomDropdown(
-                            // autovalidateMode:
-                            //     AutovalidateMode.onUserInteraction,
                             hint: const Text("choose state"),
                             validator: (value) {
                               if (value == null) {

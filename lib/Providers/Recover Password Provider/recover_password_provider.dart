@@ -31,22 +31,6 @@ class RecoverPasswordProvider extends ChangeNotifier {
             ],
           );
         }
-        // else {
-        //   updateLoader(false);
-        //   cancelTimer();
-        //   popUp(
-        //     context: context,
-        //     title: "${response.data['message']}", // show popUp
-        //     actions: [
-        //       TextButton(
-        //         onPressed: () {
-        //           Navigator.of(context).pop();
-        //         },
-        //         child: const Text("okay"),
-        //       ),
-        //     ],
-        //   );
-        // }
       }
       return response.data;
     } catch (error) {

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'Dio Client/dio_client.dart';
-import 'Dio Exeption Handling/dio_exception_handling.dart';
+import 'Dio Exception Handling/dio_exception_handling.dart';
 
 class AppApi {
   final dioClient = DioClient();
@@ -128,8 +128,6 @@ class AppApi {
     }
   }
 
-
-
   /// Support Create API
   Future supportCreateRequest({required FormData body}){
     try {
@@ -174,8 +172,18 @@ class AppApi {
     }
   }
 
+  /// Withdrawal UPI
+  Future withdrawalUpi({required FormData body}){
+    try{
+      final response = dioClient.post("withdrawal/upi",data: body);
+      return response;
+    } on DioError catch (error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+}
 
-  /// Points Transfer API               -- not implement
+  /// Points Transfer API
   Future pointsTransferApi({required FormData body}){
     try{
       final response = dioClient.post("transfer/point-transfer",data: body);
@@ -193,6 +201,28 @@ class AppApi {
       return response;
     } on DioError catch (error){
       final errorMessage = DioExceptions.fromDioError(error);
+      throw errorMessage;
+    }
+  }
+
+  /// Refer Check API
+  Future referCheckApi(String referCode){
+    try{
+      final response = dioClient.get("login/refer-check/$referCode");
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
+
+  /// Transaction History API
+  Future transactionHistoryApi(){
+    try{
+      final response = dioClient.get("withdrawal/transaction-history");
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
       throw errorMessage;
     }
   }

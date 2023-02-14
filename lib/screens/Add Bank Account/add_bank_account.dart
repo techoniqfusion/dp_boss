@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dp_boss/Component/textheading.dart';
+import 'package:dp_boss/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,10 +8,12 @@ import 'package:provider/provider.dart';
 import '../../Component/custom_button.dart';
 import '../../Component/custom_textfield.dart';
 import '../../Component/icon_card.dart';
+import '../../Component/pop_up.dart';
 import '../../Providers/Add Bank Details Provider/add_bank_details_provider.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_font.dart';
 import '../../utils/app_images.dart';
+import '../../utils/app_route.dart';
 
 class AddBankAccount extends StatefulWidget {
   const AddBankAccount({Key? key}) : super(key: key);
@@ -20,7 +23,6 @@ class AddBankAccount extends StatefulWidget {
 }
 
 class _AddBankAccountState extends State<AddBankAccount> {
-
   final formKey = GlobalKey<FormState>();
   bool isShowOverlayLoader = false;
   var accHolderNameController = TextEditingController();
@@ -28,28 +30,6 @@ class _AddBankAccountState extends State<AddBankAccount> {
   var ifscController = TextEditingController();
   var branchController = TextEditingController();
   var bankNameController = TextEditingController();
-
-  /// validation
-  String? validate(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    }
-    return null;
-  }
-
-  /// validation for IFSC Code
-  String? validateIfsc(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length < 11) {
-      return "length should be 11";
-    } else if (
-    // !RegExp(r'^[a-zA-Z0-9]+$')
-    !RegExp(r'^[A-Z]{4}0[A-Z0-9]{6}$').hasMatch(value)) {
-      return "Invalid IFSC Code";
-    }
-    return null;
-  }
 
   @override
   void dispose() {
@@ -63,60 +43,79 @@ class _AddBankAccountState extends State<AddBankAccount> {
   @override
   Widget build(BuildContext context) {
     final provider =
-    Provider.of<AddBankDetailsProvider>(context, listen: false);
+        Provider.of<AddBankDetailsProvider>(context, listen: false);
     return Stack(
       children: [
         Scaffold(
           bottomNavigationBar: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15),
             child: CustomButton(
               // width: AppSize.getWidth(context),
               isLoading: context.watch<AddBankDetailsProvider>().isShowLoader,
               onPressed: () async {
-              var formValidate = formKey.currentState!.validate();
-              if (formValidate == true) {
+                var formValidate = formKey.currentState?.validate();
+                if (formValidate == true) {
                   var formData = FormData.fromMap({
                     "account_number": accountNumberController.text,
                     "account_ifsc_code": ifscController.text,
                     "account_holder_name": accHolderNameController.text
                   });
                   print("add bank account form data ${formData.fields}");
-                 var response = await provider.addBankDetails(context, formData);
-                 if(response["status"] == 200){
-                   accHolderNameController.clear();
-                   accountNumberController.clear();
-                   ifscController.clear();
-                   branchController.clear();
-                   bankNameController.clear();
-                 }
+                  var response =
+                      await provider.addBankDetails(context, formData);
+                  if (response["status"] == 200) {
+                    popUp(
+                      context: context, title: response['message'],
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.popAndPushNamed(context, AppScreen.dashboard);
+                          },
+                          child: const Text("okay"),
+                        ),
+                      ],
+                    );
+                    // accHolderNameController.clear();
+                    // accountNumberController.clear();
+                    // ifscController.clear();
+                    // branchController.clear();
+                    // bankNameController.clear();
+                  }
                 }
               },
               buttonText: "Continue",
-              backgroundColor: const MaterialStatePropertyAll<Color>(AppColor.lightYellow),
+              backgroundColor:
+                  const MaterialStatePropertyAll<Color>(AppColor.lightYellow),
             ),
           ),
           appBar: AppBar(
             elevation: 1,
-            title: const Text("Add Bank Account",style: TextStyle(
-                fontFamily: AppFont.poppinsMedium,
-                fontSize: 14,
-                color: AppColor.black),),
+            title: const Text(
+              "Add Bank Account",
+              style: TextStyle(
+                  fontFamily: AppFont.poppinsMedium,
+                  fontSize: 14,
+                  color: AppColor.black),
+            ),
             backgroundColor: Colors.white,
             leading: iconCard(
                 icon: SvgPicture.asset(AppImages.backIcon),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pushReplacementNamed(context, AppScreen.dashboard)
+                      .then((value) => setState(() {}));
                 }),
           ),
           body: Form(
             key: formKey,
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
               children: [
                 textHeading(text: "Account Holder Name"),
                 CustomTextField(
-                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z]+|\s")),],
-                  validator: validate,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z]+|\s")),
+                  ],
+                  validator: Validation.validate,
                   controller: accHolderNameController,
                   horizontalContentPadding: 30,
                   hintText: "Account Holder Name",
@@ -124,10 +123,11 @@ class _AddBankAccountState extends State<AddBankAccount> {
                 ),
 
                 textHeading(text: "Account Number"),
+
                 /// Account Number TextField
                 CustomTextField(
                   // obscureText: true,
-                  validator: validate,
+                  validator: Validation.validate,
                   maxLength: 18,
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(
@@ -143,7 +143,7 @@ class _AddBankAccountState extends State<AddBankAccount> {
                 textHeading(text: "IFSC Code"),
                 CustomTextField(
                   textCapitalization: TextCapitalization.characters,
-                  validator: validateIfsc,
+                  validator: Validation.validateIfsc,
                   controller: ifscController,
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(
@@ -189,6 +189,7 @@ class _AddBankAccountState extends State<AddBankAccount> {
                 ),
 
                 textHeading(text: "Branch"),
+
                 /// Branch TextField
                 CustomTextField(
                   controller: branchController,
@@ -199,9 +200,10 @@ class _AddBankAccountState extends State<AddBankAccount> {
                 ),
 
                 textHeading(text: "Bank Name"),
+
                 /// Bank Name TextField
                 CustomTextField(
-                  validator: validate,
+                  validator: Validation.validate,
                   controller: bankNameController,
                   horizontalContentPadding: 30,
                   hintText: "Enter Bank Name",

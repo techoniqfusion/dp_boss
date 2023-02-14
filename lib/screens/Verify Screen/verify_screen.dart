@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:dp_boss/Component/custom_textfield.dart';
 import 'package:dp_boss/utils/app_font.dart';
+import 'package:dp_boss/utils/validation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,8 +32,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   var panNoController = TextEditingController();
   bool isCompleted = false; //check completeness of inputs
 
-  final formKey =
-      GlobalKey<FormState>(); //form object to be used for form validation
+  final formKey = GlobalKey<FormState>(); //form object to be used for form validation
   final form2Key = GlobalKey<FormState>();
 
   File? panFrontImg;
@@ -188,22 +188,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
         print("Camera access denied!.. $cameraStatus and $storageStatus");
       }
     }
-  }
-
-  String? validatePan(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (!RegExp("^([A-Z]){5}([0-9]){4}([A-Z]){1}?\$").hasMatch(value)) {
-      return "Invalid PAN Number";
-    }
-    return null;
-  }
-
-  String? validateAadhaar(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length != 12) return "Invalid Aadhaar Number";
-    return null;
   }
 
   @override
@@ -394,7 +378,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 key: formKey,
                 child: CustomTextField(
                   controller: aadhaarNoController,
-                  validator: validateAadhaar,
+                  validator: Validation.validateAadhaar,
                   maxLength: 12,
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(
@@ -564,7 +548,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                   key: form2Key,
                   child: CustomTextField(
                     controller: panNoController,
-                    validator: validatePan,
+                    validator: Validation.validatePan,
                     textCapitalization: TextCapitalization.characters,
                     maxLength: 10,
                     inputFormatters: [

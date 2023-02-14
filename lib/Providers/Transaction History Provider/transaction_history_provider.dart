@@ -1,21 +1,21 @@
-import 'package:dp_boss/API%20Response%20Model/Support%20History%20ID%20Model/support_history_id_model.dart';
+import 'package:dp_boss/API%20Response%20Model/Transaction%20History%20Model/transaction_history_model.dart';
 import 'package:flutter/material.dart';
 import '../../API Integration/call_api.dart';
 import '../../Component/pop_up.dart';
 import '../../utils/logout_user.dart';
 
-class SupportHistoryIdProvider extends ChangeNotifier{
-  final appAPi = AppApi();
-  List<SupportHistoryIdModel> supportHistoryIDList = [];
+class TransactionHistoryProvider extends ChangeNotifier{
 
-  Future supportDataId(BuildContext context, String supportId) async{
+  final appAPi = AppApi();
+
+  Future transactionHistory(BuildContext context) async{
     try{
-      final response = await appAPi.supportData(supportId);
+      final response = await appAPi.transactionHistoryApi();
       if(response.data['status'] == true){
-        List temp = response.data['SupportHistory'];
-        supportHistoryIDList = temp.map((e) => SupportHistoryIdModel.fromJson(e)).toList();
-        notifyListeners();
-        return supportHistoryIDList;
+        print("transaction history response is ${response.data}");
+        final responseData = TransactionHistoryModel.fromJson(response.data);
+        // notifyListeners();
+        return responseData;
       }
       else {
         if(response.data['status_code'] == 401){
@@ -46,7 +46,7 @@ class SupportHistoryIdProvider extends ChangeNotifier{
       }
     }
     catch (error) {
-      print("Support History ID API error $error");
+      print("Transaction History API error $error");
       rethrow;
     }
   }

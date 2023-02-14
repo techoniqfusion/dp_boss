@@ -115,7 +115,7 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
               ListView.builder(
-                padding: EdgeInsets.symmetric(vertical: 10),
+                padding: EdgeInsets.only(top: 10,bottom: kBottomNavigationBarHeight + 20),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: 10,

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:dp_boss/Providers/Recover%20Password%20Provider/recover_password_provider.dart';
-import 'package:dp_boss/screens/OTP%20Screen/otp_screen.dart';
 import 'package:dp_boss/utils/app_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import '../../utils/app_color.dart';
 import '../../utils/app_font.dart';
 import '../../utils/app_images.dart';
 import '../../utils/app_size.dart';
+import '../../utils/validation.dart';
 
 class RecoverPassword extends StatefulWidget {
   const RecoverPassword({Key? key}) : super(key: key);
@@ -22,15 +22,6 @@ class RecoverPassword extends StatefulWidget {
 class _RecoverPasswordState extends State<RecoverPassword> {
   final mobileNumberController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-
-  String? validateMobile(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length < 10) {
-      return "Invalid Mobile Number";
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +79,7 @@ class _RecoverPasswordState extends State<RecoverPassword> {
                         fontSize: 14),
                   ),
                 ),
-                validator: validateMobile,
+                validator: Validation.validateMobile,
                 // onChanged: (val) {
                 //   if (val.length == 10) {
                 //     FocusScope.of(context).unfocus(); // disable keyboard

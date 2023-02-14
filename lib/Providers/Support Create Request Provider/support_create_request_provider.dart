@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../API Integration/call_api.dart';
 import 'package:dio/dio.dart';
 import '../../Component/pop_up.dart';
-import '../../utils/app_route.dart';
 import '../../utils/logout_user.dart';
 
 class SupportCreateRequestProvider extends ChangeNotifier{
@@ -17,14 +16,6 @@ class SupportCreateRequestProvider extends ChangeNotifier{
       print(response.data);
       if(response.data['status'] == true){
         updateLoader(false);
-        popUp(context: context, title: response.data['message'], actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("okay"),
-          ),
-        ]);
       }
       else {
         if(response.data['status_code'] == 401){

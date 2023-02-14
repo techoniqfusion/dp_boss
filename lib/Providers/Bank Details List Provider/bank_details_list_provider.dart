@@ -7,16 +7,13 @@ import '../../utils/logout_user.dart';
 class BankDetailsListProvider extends ChangeNotifier{
 
   final appAPi = AppApi();
-  List<BankDetailsListModel> bankDetailsList = [];
 
   Future bankDetails(BuildContext context) async{
     try{
       final response = await appAPi.bankAllData();
       if(response.data['status'] == true){
-        List temp = response.data['data'];
-        bankDetailsList = temp.map((e) => BankDetailsListModel.fromJson(e)).toList();
-        notifyListeners();
-        return bankDetailsList;
+        final responseData = BankDetailsListModel.fromJson(response.data);
+        return responseData;
       }
       else {
         if(response.data['status_code'] == 401){

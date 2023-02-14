@@ -1,6 +1,9 @@
+import 'package:dp_boss/Providers/Add%20Upi%20Provider/add_upi_provider.dart';
 import 'package:dp_boss/Providers/Bank%20Details%20List%20Provider/bank_details_list_provider.dart';
+import 'package:dp_boss/Providers/Points%20Provider/points_provider.dart';
 import 'package:dp_boss/Providers/Profile%20Update%20Provider/profile_update_provider.dart';
 import 'package:dp_boss/Providers/Recover%20Password%20Provider/recover_password_provider.dart';
+import 'package:dp_boss/Providers/Transaction%20History%20Provider/transaction_history_provider.dart';
 import 'package:dp_boss/Providers/Verificartion%20Provider/verification_provider.dart';
 import 'package:dp_boss/screens/Dashboard/dashboard.dart';
 import 'package:dp_boss/screens/Login%20Screen/login_screen.dart';
@@ -146,6 +149,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => VerificationProvider()),
         ChangeNotifierProvider(create: (_) => SupportHistoryIdProvider()),
         ChangeNotifierProvider(create: (_) => BankDetailsListProvider()),
+        ChangeNotifierProvider(create: (_) => PointsTransferProvider()),
+        ChangeNotifierProvider(create: (_) => TransactionHistoryProvider()),
+        ChangeNotifierProvider(create: (_) => AddUpiProvider()),
       ],
       child: MaterialApp(
         theme: ThemeData(

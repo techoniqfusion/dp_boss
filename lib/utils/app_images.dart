@@ -18,6 +18,9 @@ class AppImages{
   static const String whatsApp = "${pngPath}whatsapp.png";
   static const String errorImg = "${pngPath}error.png";
   static const String avatar = "${pngPath}avatar.png";
+  static const String paytm = "${pngPath}paytm.png";
+  static const String phonePe = "${pngPath}phonePe.png";
+  static const String googlePay = "${pngPath}googlePay.png";
 
   ///  loader gif
   static const String loader = "assets/images/loader.gif";
@@ -33,9 +36,10 @@ class AppImages{
   static const String forwardIcon = "${svgPath}forward_icon.svg";
   static const String calendarIcon = "${svgPath}calendar_icon.svg";
   static const String backIcon = "${svgPath}back_icon.svg";
-  static const String circleIcon = "${svgPath}circle.svg";
   static const String withdrawalIcon1 = "${svgPath}withdrawal_icon1.svg";
   static const String depositIcon1 = "${svgPath}deposit_icon1.svg";
   static const String share = "${svgPath}share.svg";
   static const String robot = "${svgPath}robot.svg";
+  static const String creditIcon = "${svgPath}credit_icon.svg";
+  static const String debitIcon = "${svgPath}debit_icon.svg";
 }

@@ -63,7 +63,7 @@ class SQLService {
     await db?.transaction((txn) async {
       var qry =
           'INSERT INTO users(email, name, mobile, address, gender, dob, state, city, my_refer, wallet, created_at) VALUES("${data.email}", "${data.name}", "${data.mobile}", "${data.address}", "${data.gender}", "${data.dob}", "${data.state}", "${data.city}", "${data.myRefer}", "${data.wallet}", "${data.createdAt}")';
-      print("insert query => ${qry}");
+      // print("insert query => ${qry}");
       int id1 = await txn.rawInsert(qry);
       return id1;
     });

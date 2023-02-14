@@ -45,6 +45,8 @@ class _DashboardState extends State<Dashboard> {
     ),
   ];
 
+
+
   @override
   Widget build(BuildContext context) {
     var selectedPage = list.firstWhere((element) => element.isSelect);
@@ -108,12 +110,13 @@ class _DashboardState extends State<Dashboard> {
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
       ),
-      bottomNavigationBar: Container(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Container(
         height: 60,
         width: AppSize.getWidth(context),
         margin: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-            color: AppColor.lightYellow.withOpacity(0.1),
+            color: AppColor.lightYellow.withOpacity(1),
             borderRadius: BorderRadius.circular(23),
             ),
         child: Row(

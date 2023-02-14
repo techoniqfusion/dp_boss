@@ -7,7 +7,6 @@ import 'package:social_share/social_share.dart';
 import '../../Component/custom_button.dart';
 import '../../Component/custom_textfield.dart';
 import '../../Component/icon_card.dart';
-import '../../Component/pop_up.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_font.dart';
 import '../../utils/app_images.dart';
@@ -320,7 +319,9 @@ class _ReferAndEarnState extends State<ReferAndEarn> {
                     onTap: () async {
                       await SocialShare.shareOptions(
                           "refer link")
-                          .catchError((onError) {});
+                          .catchError((onError) {
+                            return onError;
+                      });
                     },
                     child: Image.asset(
                       AppImages.more,

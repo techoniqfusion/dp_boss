@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../API Integration/call_api.dart';
 import '../../Component/pop_up.dart';
-import '../../utils/db_helper.dart';
 
 class RegistrationProvider extends ChangeNotifier{
 

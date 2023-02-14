@@ -1,10 +1,16 @@
+import 'package:dp_boss/API%20Response%20Model/Transaction%20History%20Model/transaction_history_model.dart';
+import 'package:dp_boss/Providers/Transaction%20History%20Provider/transaction_history_provider.dart';
 import 'package:dp_boss/utils/app_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+import '../../Component/custom_loader.dart';
 import '../../Component/icon_card.dart';
+import '../../Component/try_again.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_font.dart';
 import '../../utils/app_images.dart';
+import '../../utils/app_route.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({Key? key}) : super(key: key);
@@ -14,12 +20,18 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+
+  Future getRefreshData() async{
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<TransactionHistoryProvider>(context,listen: false);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 10),
         child: Row(
           children: [
             button(
@@ -49,74 +61,160 @@ class _WalletScreenState extends State<WalletScreen> {
               fontSize: 14,
               color: AppColor.black),
         ),
-      ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        children: [
-          Container(
-            height: 173,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                image: const DecorationImage(
-                    image: AssetImage(AppImages.walletCard),
-                    fit: BoxFit.cover)),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 22.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 22,
-                  ),
-                  Text(
-                    "Current Balance",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: AppFont.poppinsMedium),
-                  ),
-                  Text.rich(TextSpan(
-                      text: "₹",
-                      style: TextStyle(
-                          letterSpacing: 0.5,
-                          fontSize: 34,
-                          color: Colors.white,
-                          fontFamily: AppFont.poppinsSemiBold),
-                      children: [
-                        TextSpan(
-                          text: "1000.00",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 34,
-                              fontFamily: AppFont.poppinsBold),
-                        )
-                      ])),
-                ],
-              ),
-            ),
+        actions: [
+          iconCard(icon: Text("Pt",style: TextStyle(color: AppColor.white,fontSize: 14),),
+          onPressed: (){
+            Navigator.pushNamed(context, AppScreen.pointsScreen);
+          }
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 18.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Transaction History",
-                    style: TextStyle(
-                      color: AppColor.black,
-                      fontSize: 16,
-                      fontFamily: AppFont.poppinsSemiBold,
-                    )),
-                Text(
-                  "All",
-                  style: TextStyle(
-                      color: AppColor.customGrey,
-                      fontSize: 14,
-                      fontFamily: AppFont.poppinsSemiBold),
-                )
-              ],
-            ),
-          )
+          SizedBox(width: 12,)
         ],
+      ),
+      body: FutureBuilder(
+          future: provider.transactionHistory(context),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                var transactionHistory = snapshot.data as TransactionHistoryModel;
+                // var descendingOrder = transactionHistory.reversed.toList();
+                var transactionHistoryList = transactionHistory.data?.reversed.toList();
+                return RefreshIndicator(
+                  color: AppColor.lightYellow,
+                  onRefresh: getRefreshData,
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    children: [
+                      Container(
+                        height: 173,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            image: const DecorationImage(
+                                image: AssetImage(AppImages.walletCard),
+                                fit: BoxFit.cover)),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 22.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 22,
+                              ),
+                              Text(
+                                "Current Balance",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontFamily: AppFont.poppinsMedium),
+                              ),
+                              Text.rich(TextSpan(
+                                  text: "₹",
+                                  style: TextStyle(
+                                      letterSpacing: 0.5,
+                                      fontSize: 34,
+                                      color: Colors.white,
+                                      fontFamily: AppFont.poppinsSemiBold),
+                                  children: [
+                                    TextSpan(
+                                      text: transactionHistory.wallet,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 34,
+                                          fontFamily: AppFont.poppinsBold),
+                                    )
+                                  ])),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 18.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Transaction History",
+                                style: TextStyle(
+                                  color: AppColor.black,
+                                  fontSize: 16,
+                                  fontFamily: AppFont.poppinsSemiBold,
+                                )),
+                            Text(
+                              "All",
+                              style: TextStyle(
+                                  color: AppColor.customGrey,
+                                  fontSize: 14,
+                                  fontFamily: AppFont.poppinsSemiBold),
+                            )
+                          ],
+                        ),
+                      ),
+                      transactionHistoryList!.isNotEmpty ? ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        // padding: EdgeInsets.symmetric(horizontal: 15,vertical: 15),
+                        itemCount: transactionHistoryList.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            minLeadingWidth: 0,
+                            leading: Container(
+                              height: 51,
+                              width: 51,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: AppColor.yellowGradient),
+                              child: Center(
+                                child: Icon(
+                                  Icons.person,
+                                  size: 37,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            title: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                  Text(transactionHistoryList[index].transactionType == "CR" ? "Deposit" : "Credit",style: TextStyle(
+                                    color: AppColor.black, fontFamily: AppFont.poppinsSemiBold,
+                                    fontSize: 14
+                                  ),),
+                                    Spacer(),
+                                    transactionHistoryList[index].transactionType == "CR" ? SvgPicture.asset(AppImages.debitIcon) : SvgPicture.asset(AppImages.creditIcon),
+                                    SizedBox(width: 7,),
+                                    Text("₹${transactionHistoryList[index].transactionAmt}",
+                                    style: TextStyle(color: AppColor.black,fontFamily: AppFont.poppinsSemiBold,fontSize: 14),
+                                    ),
+                                ],),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(transactionHistoryList[index].transactionTitle ?? "",style: TextStyle(
+                                      color: AppColor.darkGrey,fontSize: 14,fontFamily: AppFont.poppinsRegular
+                                    ),),
+                                    Text(transactionHistoryList[index].createdAt ?? "",
+                                        style: TextStyle(
+                                            color: AppColor.darkGrey,fontSize: 14,fontFamily: AppFont.poppinsRegular
+                                        )
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        },) :
+                      Center(child: Text("No Transaction History",style: TextStyle(
+                          fontFamily: AppFont.poppinsSemiBold
+                      ),),)
+                    ],
+                  )
+                );
+              }
+              else {
+                return tryAgain(
+                    onTap: () => setState(() {}));
+              }
+            }
+            return customLoader();
+          }
       ),
     );
   }

@@ -1,11 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:dp_boss/Providers/Registration%20Provider/registration_provider.dart';
+import 'package:dp_boss/utils/validation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../API Integration/call_api.dart';
 import '../../Component/custom_button.dart';
 import '../../Component/custom_textfield.dart';
+import '../../Component/pop_up.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_font.dart';
 import '../../utils/app_images.dart';
@@ -26,43 +29,20 @@ class _RegistrationState extends State<Registration> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final referCodeController = TextEditingController();
-
   final formKey = GlobalKey<FormState>();
+  String referedBy = "";
+  bool referCodeStatus = false;
+  bool isReadOnly = false;
+  final appApi = AppApi();
 
   @override
   void initState(){
-
     super.initState();
-  }
-
-  String? validatePass(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length < 6) {
-      return "Should at least 6 characters";
-    }
-    return null;
-  }
-
-  String? validateMobile(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length < 10) {
-      return "Invalid Mobile Number";
-    }
-    return null;
   }
 
   String? validateConfirmPassword(String? value) {
     if (value!.isEmpty) return 'Required';
     if (value != passwordController.text) return 'Not Match';
-    return null;
-  }
-
-  String? validation(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    }
     return null;
   }
 
@@ -121,7 +101,7 @@ class _RegistrationState extends State<Registration> {
               ),
 
               CustomTextField(
-                validator: validation,
+                validator: Validation.validate,
                 hintText: "Full Name",
                 controller: fullNameController,
               ),
@@ -131,7 +111,7 @@ class _RegistrationState extends State<Registration> {
               ),
 
               CustomTextField(
-                validator: validation,
+                validator: Validation.validateMobile,
                 hintText: "Enter Mobile Number",
                 // onChanged: (val) {
                 //   if (val.length == 10) {
@@ -157,7 +137,7 @@ class _RegistrationState extends State<Registration> {
                   obscureText: _isObscure,
                   fillColor: AppColor.white,
                   hintText: "Enter Password",
-                  validator: validatePass,
+                  validator: Validation.validatePass,
                   controller: passwordController,
                   suffixIcon: IconButton(
                       icon: Icon(
@@ -187,12 +167,88 @@ class _RegistrationState extends State<Registration> {
                 height: 15,
               ),
 
-              CustomTextField(
-                // obscureText: true,
-                // validator: validateConfirmPassword,
-                controller: referCodeController,
-                hintText: "Refer Code",
-              ),
+              StatefulBuilder(builder: (context, setTextField) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomTextField(
+                      padding: EdgeInsets.only(top: 20, bottom: 10),
+                      controller: referCodeController,
+                      hintText: "Refer Code",
+                      maxLength: 6,
+                      readOnly: isReadOnly,
+                      suffixIcon: referCodeController.text.length == 6
+                          ? IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          color: AppColor.darkGrey,
+                        ),
+                        onPressed: () {
+                          referCodeController.clear();
+                          setTextField(() {
+                            referedBy = "";
+                            isReadOnly = false;
+                          });
+                        },
+                      )
+                          : SizedBox.shrink(),
+                      onChanged: (value) async {
+                        if (value.length == 6) {
+                          referCodeController.value = TextEditingValue(
+                              text: value.toUpperCase(),
+                              selection: referCodeController.selection);
+                          FocusScope.of(context).unfocus();
+                          try {
+                            final response = await appApi.referCheckApi(referCodeController.text);
+                            // dioClient.post(
+                            //     "${Endpoints.baseUrl}after-login/user-first-time/refer-check",
+                            //     data: formData);
+                            print(
+                                "response of refer code api is ${response}");
+                            if (response.data['status'] == true) {
+                              setTextField(() {
+                                referedBy = response.data['name'];
+                                referCodeStatus = true;
+                                isReadOnly = true;
+                              });
+                            } else {
+                              setTextField(() {
+                                referCodeStatus = false;
+                                isReadOnly = true;
+                              });
+                              popUp(
+                                  context: context,
+                                  title: response.data['message'],
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("okay"))
+                                  ]);
+                            }
+                          } catch (error) {}
+                        }
+                      },
+                      // suffixIcon: IconButton(
+                      //   onPressed: () => _selectDate(context),
+                      //   icon: Icon(Icons.calendar_today,color: Colors.black,),
+                      // ),
+                    ),
+                    Visibility(
+                      visible: referedBy.isNotEmpty,
+                      child: Padding(
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 6.0),
+                        child: Text(
+                          "Referred by ${referedBy}",
+                          style: TextStyle(color: Colors.green),
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              }),
 
               SizedBox(
                 height: 50,

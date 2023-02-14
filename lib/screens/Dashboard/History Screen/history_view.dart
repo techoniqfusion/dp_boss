@@ -67,6 +67,6 @@ class _HistoryViewState extends State<HistoryView> with SingleTickerProviderStat
           ),
         ],
       )
-    );;
+    );
   }
 }

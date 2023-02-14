@@ -142,6 +142,14 @@ class _CreateRequestState extends State<CreateRequest> {
                    subjectController.clear();
                    messageController.clear();
                    _image = null;
+                   popUp(context: context, title: response['message'], actions: [
+                     TextButton(
+                       onPressed: () {
+                         Navigator.popAndPushNamed(context, AppScreen.helpAndSupport);
+                       },
+                       child: const Text("okay"),
+                     ),
+                   ]);
                  }
                 } else {
                   popUp(

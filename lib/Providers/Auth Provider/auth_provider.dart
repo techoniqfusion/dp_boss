@@ -4,7 +4,6 @@ import 'package:dp_boss/Component/pop_up.dart';
 import 'package:dp_boss/utils/app_route.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../API Integration/API URL endpoints/api_endpoints.dart';
 import '../../API Integration/call_api.dart';
 import '../../API Response Model/Registration Model/registration_model.dart';
 import '../../utils/db_helper.dart';

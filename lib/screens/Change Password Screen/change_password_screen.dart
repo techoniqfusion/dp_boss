@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dp_boss/Providers/Recover%20Password%20Provider/recover_password_provider.dart';
+import 'package:dp_boss/utils/validation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,15 +26,6 @@ class _ChangePasswordState extends State<ChangePassword> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   bool _isObscure = true;
-
-  String? validatePass(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    } else if (value.length < 6) {
-      return "Should at least 6 characters";
-    }
-    return null;
-  }
 
   String? validateConfirmPassword(String? value) {
     if (value!.isEmpty) return 'Required';
@@ -160,7 +152,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                   obscureText: _isObscure,
                   fillColor: AppColor.white,
                   hintText: "Enter Password",
-                  validator: validatePass,
+                  validator: Validation.validatePass,
                   controller: passwordController,
                   suffixIcon: IconButton(
                       icon: Icon(
