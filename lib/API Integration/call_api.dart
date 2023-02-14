@@ -226,4 +226,15 @@ class AppApi {
       throw errorMessage;
     }
   }
+
+  /// Dashboard API
+  Future dashboardApi(){
+    try{
+      final response = dioClient.get("user/dashboard");
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
 }

@@ -40,12 +40,14 @@ class _RegistrationState extends State<Registration> {
     super.initState();
   }
 
+  /// validation for confirm password
   String? validateConfirmPassword(String? value) {
     if (value!.isEmpty) return 'Required';
     if (value != passwordController.text) return 'Not Match';
     return null;
   }
 
+  /// dispose all controllers
   @override
   void dispose(){
     fullNameController.dispose();
@@ -57,6 +59,7 @@ class _RegistrationState extends State<Registration> {
   }
 
   bool _isObscure = true;
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<RegistrationProvider>(context,listen: false);
@@ -68,11 +71,13 @@ class _RegistrationState extends State<Registration> {
           key: formKey,
           child: Column(
             children: [
+
               Padding(
                 padding: EdgeInsets.only(
                     top: AppBar().preferredSize.height + 40, bottom: 100),
                 child: Image.asset(AppImages.logo),
               ),
+
               Align(
                 alignment: Alignment.topLeft,
                 child: Text(
@@ -83,9 +88,11 @@ class _RegistrationState extends State<Registration> {
                       fontFamily: AppFont.poppinsSemiBold),
                 ),
               ),
+
               SizedBox(
                 height: 2,
               ),
+
               Align(
                 alignment: Alignment.topLeft,
                 child: Text(
@@ -96,6 +103,7 @@ class _RegistrationState extends State<Registration> {
                       fontFamily: AppFont.poppinsRegular),
                 ),
               ),
+
               SizedBox(
                 height: 25,
               ),
@@ -254,7 +262,6 @@ class _RegistrationState extends State<Registration> {
                 height: 50,
               ),
               // SizedBox(height: 20,),
-
               CustomButton(
                 isLoading: context.watch<RegistrationProvider>().buttonLoader,
                 onPressed: () async{
@@ -283,9 +290,11 @@ class _RegistrationState extends State<Registration> {
                 backgroundColor: MaterialStateProperty.all<Color>(AppColor.lightYellow),
                 buttonText: "CREATE ACCOUNT",
               ),
+
               SizedBox(
                 height: 15,
               ),
+
               Text.rich(TextSpan(
                   text: "Already have an account ? ",
                   style: TextStyle(
@@ -305,9 +314,11 @@ class _RegistrationState extends State<Registration> {
                     )
                   ]
               )),
+
               SizedBox(
                 height: 15,
               ),
+
               Text.rich(TextSpan(
                   text: "By continuing you agree to the ",
                   style: TextStyle(

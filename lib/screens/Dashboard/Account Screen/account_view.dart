@@ -311,7 +311,8 @@ class _AccountViewState extends State<AccountView> {
                 }
                 return customLoader();
               },
-            )));
+            )
+        ));
   }
 
   Widget addAccountTile({void Function()? onPressed, required String text}) {

@@ -1,5 +1,6 @@
 import 'package:dp_boss/Providers/Add%20Upi%20Provider/add_upi_provider.dart';
 import 'package:dp_boss/Providers/Bank%20Details%20List%20Provider/bank_details_list_provider.dart';
+import 'package:dp_boss/Providers/Dashboard%20Provider/dashboard_provider.dart';
 import 'package:dp_boss/Providers/Points%20Provider/points_provider.dart';
 import 'package:dp_boss/Providers/Profile%20Update%20Provider/profile_update_provider.dart';
 import 'package:dp_boss/Providers/Recover%20Password%20Provider/recover_password_provider.dart';
@@ -152,6 +153,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => PointsTransferProvider()),
         ChangeNotifierProvider(create: (_) => TransactionHistoryProvider()),
         ChangeNotifierProvider(create: (_) => AddUpiProvider()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
       ],
       child: MaterialApp(
         theme: ThemeData(
