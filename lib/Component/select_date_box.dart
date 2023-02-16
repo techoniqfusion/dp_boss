@@ -16,31 +16,32 @@ class _SelectDateBoxState extends State<SelectDateBox> {
   DateTime? selectedDate;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      height: 40,
-      decoration: BoxDecoration(
-        gradient: AppColor.yellowGradient2,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            widget.chooseDate == null
-                ? "select date"
-                : "${widget.chooseDate}".split(' ')[0],
-            style: const TextStyle(color: AppColor.black),
-          ),
-          InkWell(
-              onTap: () {
-                _selectDate(context);
-              },
-              child: SvgPicture.asset(AppImages.calendarIcon))
-          // IconButton(onPressed: (){
-          //   _selectDate(context);
-          // }, icon: )
-        ],
+    return InkWell(
+      onTap: () {
+        _selectDate(context);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        height: 40,
+        decoration: BoxDecoration(
+          gradient: AppColor.yellowGradient2,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              widget.chooseDate == null
+                  ? "select date"
+                  : "${widget.chooseDate}".split(' ')[0],
+              style: const TextStyle(color: AppColor.black),
+            ),
+            SvgPicture.asset(AppImages.calendarIcon)
+            // IconButton(onPressed: (){
+            //   _selectDate(context);
+            // }, icon: )
+          ],
+        ),
       ),
     );
   }

@@ -15,15 +15,15 @@ import '../../utils/app_images.dart';
 import '../../utils/app_size.dart';
 
 class Registration extends StatefulWidget {
-
-  const Registration({Key? key,}) : super(key: key);
+  const Registration({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<Registration> createState() => _RegistrationState();
 }
 
 class _RegistrationState extends State<Registration> {
-
   final fullNameController = TextEditingController();
   final mobileNumberController = TextEditingController();
   final passwordController = TextEditingController();
@@ -36,7 +36,7 @@ class _RegistrationState extends State<Registration> {
   final appApi = AppApi();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
   }
 
@@ -49,7 +49,7 @@ class _RegistrationState extends State<Registration> {
 
   /// dispose all controllers
   @override
-  void dispose(){
+  void dispose() {
     fullNameController.dispose();
     mobileNumberController.dispose();
     passwordController.dispose();
@@ -62,7 +62,7 @@ class _RegistrationState extends State<Registration> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<RegistrationProvider>(context,listen: false);
+    final provider = Provider.of<RegistrationProvider>(context, listen: false);
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -71,7 +71,6 @@ class _RegistrationState extends State<Registration> {
           key: formKey,
           child: Column(
             children: [
-
               Padding(
                 padding: EdgeInsets.only(
                     top: AppBar().preferredSize.height + 40, bottom: 100),
@@ -187,18 +186,18 @@ class _RegistrationState extends State<Registration> {
                       readOnly: isReadOnly,
                       suffixIcon: referCodeController.text.length == 6
                           ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: AppColor.darkGrey,
-                        ),
-                        onPressed: () {
-                          referCodeController.clear();
-                          setTextField(() {
-                            referedBy = "";
-                            isReadOnly = false;
-                          });
-                        },
-                      )
+                              icon: Icon(
+                                Icons.clear,
+                                color: AppColor.darkGrey,
+                              ),
+                              onPressed: () {
+                                referCodeController.clear();
+                                setTextField(() {
+                                  referedBy = "";
+                                  isReadOnly = false;
+                                });
+                              },
+                            )
                           : SizedBox.shrink(),
                       onChanged: (value) async {
                         if (value.length == 6) {
@@ -207,12 +206,12 @@ class _RegistrationState extends State<Registration> {
                               selection: referCodeController.selection);
                           FocusScope.of(context).unfocus();
                           try {
-                            final response = await appApi.referCheckApi(referCodeController.text);
+                            final response = await appApi
+                                .referCheckApi(referCodeController.text);
                             // dioClient.post(
                             //     "${Endpoints.baseUrl}after-login/user-first-time/refer-check",
                             //     data: formData);
-                            print(
-                                "response of refer code api is ${response}");
+                            print("response of refer code api is ${response}");
                             if (response.data['status'] == true) {
                               setTextField(() {
                                 referedBy = response.data['name'];
@@ -246,8 +245,7 @@ class _RegistrationState extends State<Registration> {
                     Visibility(
                       visible: referedBy.isNotEmpty,
                       child: Padding(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 6.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
                         child: Text(
                           "Referred by ${referedBy}",
                           style: TextStyle(color: Colors.green),
@@ -264,7 +262,7 @@ class _RegistrationState extends State<Registration> {
               // SizedBox(height: 20,),
               CustomButton(
                 isLoading: context.watch<RegistrationProvider>().buttonLoader,
-                onPressed: () async{
+                onPressed: () async {
                   var isValidate = formKey.currentState?.validate();
                   var formData = FormData.fromMap({
                     "phone": mobileNumberController.text,
@@ -273,10 +271,14 @@ class _RegistrationState extends State<Registration> {
                     "cpassword": confirmPasswordController.text,
                     "refer_code": referCodeController.text,
                   });
-                  if(isValidate != null && isValidate == true){
-                    if(mobileNumberController.text.isNotEmpty && fullNameController.text.isNotEmpty && passwordController.text.isNotEmpty && confirmPasswordController.text.isNotEmpty) {
-                      final response = await provider.registration(context, formData, mobileNumberController.text);
-                      if(response['status_code'] == 204){
+                  if (isValidate != null && isValidate == true) {
+                    if (mobileNumberController.text.isNotEmpty &&
+                        fullNameController.text.isNotEmpty &&
+                        passwordController.text.isNotEmpty &&
+                        confirmPasswordController.text.isNotEmpty) {
+                      final response = await provider.registration(
+                          context, formData, mobileNumberController.text);
+                      if (response['status_code'] == 204) {
                         mobileNumberController.clear();
                         fullNameController.clear();
                         passwordController.clear();
@@ -287,7 +289,8 @@ class _RegistrationState extends State<Registration> {
                   }
                 },
                 width: AppSize.getWidth(context),
-                backgroundColor: MaterialStateProperty.all<Color>(AppColor.lightYellow),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(AppColor.lightYellow),
                 buttonText: "CREATE ACCOUNT",
               ),
 
@@ -308,12 +311,11 @@ class _RegistrationState extends State<Registration> {
                             color: AppColor.black,
                             fontSize: 14,
                             fontFamily: AppFont.poppinsSemiBold),
-                        recognizer: TapGestureRecognizer()..onTap = (){
-                          Navigator.pop(context);
-                        }
-                    )
-                  ]
-              )),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pop(context);
+                          })
+                  ])),
 
               SizedBox(
                 height: 15,
@@ -332,10 +334,8 @@ class _RegistrationState extends State<Registration> {
                             color: AppColor.yellow,
                             fontSize: 14,
                             fontFamily: AppFont.poppinsSemiBold),
-                        recognizer: TapGestureRecognizer()..onTap = (){}
-                    )
-                  ]
-              )),
+                        recognizer: TapGestureRecognizer()..onTap = () {})
+                  ])),
               SizedBox(
                 height: 15,
               ),

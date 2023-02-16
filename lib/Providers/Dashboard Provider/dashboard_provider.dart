@@ -1,5 +1,6 @@
 import 'package:dp_boss/API%20Response%20Model/Dashboard%20Model/dashboard_model.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../API Integration/call_api.dart';
 import '../../Component/pop_up.dart';
 import '../../utils/logout_user.dart';
@@ -14,6 +15,8 @@ class DashboardProvider extends ChangeNotifier{
       if(response.data['status'] == true){
         print("dashboard api response is ${response.data}");
         final responseData = DashboardModel.fromJson(response.data);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("upiId", responseData.upi ?? "");
         // notifyListeners();
         return responseData;
       }

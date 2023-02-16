@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../API Integration/API URL endpoints/api_endpoints.dart';
@@ -17,11 +18,11 @@ import '../../utils/app_color.dart';
 import '../../utils/app_font.dart';
 import '../../utils/app_images.dart';
 import '../../utils/app_size.dart';
+import '../../utils/date_time_converter.dart';
 
 class ChatScreen extends StatefulWidget {
   final String supportId;
-  const ChatScreen({Key? key,required this.supportId})
-      : super(key: key);
+  const ChatScreen({Key? key, required this.supportId}) : super(key: key);
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -40,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(listScrollController.hasClients){
+    if (listScrollController.hasClients) {
       final position = listScrollController.position.maxScrollExtent;
       listScrollController.animateTo(
         position,
@@ -51,7 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     messageController.dispose();
     listScrollController.dispose();
     super.dispose();
@@ -77,8 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
             _image = File(imageFile!.path);
           });
         }
-      }
-      else {
+      } else {
         print("Camera needs to access your storage, please provide permission");
       }
     } else {
@@ -95,7 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 actions: <Widget>[
                   CustomButton(
                     backgroundColor:
-                    MaterialStateProperty.all<Color>(AppColor.lightYellow),
+                        MaterialStateProperty.all<Color>(AppColor.lightYellow),
                     textColor: AppColor.white,
                     buttonText: 'Allow',
                     onPressed: () async {
@@ -105,7 +105,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   CustomButton(
                     backgroundColor:
-                    MaterialStateProperty.all<Color>(AppColor.lightYellow),
+                        MaterialStateProperty.all<Color>(AppColor.lightYellow),
                     textColor: AppColor.white,
                     buttonText: 'Cancel',
                     onPressed: () async {
@@ -115,8 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               );
             });
-      }
-      else {
+      } else {
         print("Camera access denied!.. $cameraStatus and $storageStatus");
       }
     }
@@ -124,7 +123,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<SupportHistoryIdProvider>(context, listen: false);
+    final provider =
+        Provider.of<SupportHistoryIdProvider>(context, listen: false);
     print("support id is => ${widget.supportId}");
     return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -145,10 +145,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     controller: messageController,
                     decoration: InputDecoration(
                       suffixIcon: IconButton(
-                        onPressed: (){
+                        onPressed: () {
                           openGallery();
                         },
-                        icon: Icon(Icons.attach_file,color: AppColor.grey1),
+                        icon: Icon(Icons.attach_file, color: AppColor.grey1),
                       ),
                       contentPadding: EdgeInsets.only(top: 5, left: 10),
                       hintText: "Message",
@@ -194,16 +194,20 @@ class _ChatScreenState extends State<ChatScreen> {
               GestureDetector(
                 onTap: () async {
                   if (messageController.text.isNotEmpty) {
-                    var chatRequest = _image != null ? FormData.fromMap({
-                      "support_id": widget.supportId,
-                      "massage": messageController.text,
-                      "image" : MultipartFile.fromFile(_image!.path.split('/').last)
-                    }) : FormData.fromMap({
-                      "support_id": widget.supportId,
-                      "massage": messageController.text,
-                    });
-                    var response = await appApi.supportUserMessage(body: chatRequest);
-                    if(response.statusCode == 200){
+                    var chatRequest = _image != null
+                        ? FormData.fromMap({
+                            "support_id": widget.supportId,
+                            "massage": messageController.text,
+                            "image": MultipartFile.fromFile(
+                                _image!.path.split('/').last)
+                          })
+                        : FormData.fromMap({
+                            "support_id": widget.supportId,
+                            "massage": messageController.text,
+                          });
+                    var response =
+                        await appApi.supportUserMessage(body: chatRequest);
+                    if (response.statusCode == 200) {
                       messageController.clear();
                       FocusScope.of(context).unfocus();
                       setState(() {});
@@ -223,7 +227,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ],
           ),
         ),
-      appBar: AppBar(
+        appBar: AppBar(
           elevation: 1,
           backgroundColor: Colors.white,
           leading: iconCard(
@@ -333,30 +337,39 @@ class _ChatScreenState extends State<ChatScreen> {
                           itemCount: chatData.length,
                           physics: const ClampingScrollPhysics(),
                           itemBuilder: (context, index) {
-                            return chatData[index].type == "robot" ? receiveMessagesCard(
-                              context: context,
-                              message: chatData[index].message ?? "",
-                              profileImage: SvgPicture.asset(AppImages.robot),
-                              time: chatData[index].createdAt ?? "",
-                            ) : senderMessagesCard(
-                              context: context,
-                              time: chatData[index].createdAt ?? "",
-                              message: chatData[index].message ?? "",
-                              profileImage: Image.asset(AppImages.avatar)
-                            );
+                            var chatDate =
+                                DateTime.parse(chatData[index].createdAt ?? "");
+                            var formattedTime =
+                                DateFormat.jm().format(chatDate);
+                            var formattedDate = extractDateFromDateTime(
+                                chatData[index].createdAt ?? "", "d MMM, ");
+                            return chatData[index].type == "robot"
+                                ? receiveMessagesCard(
+                                    context: context,
+                                    message: chatData[index].message ?? "",
+                                    profileImage:
+                                        SvgPicture.asset(AppImages.robot),
+                                    time:
+                                        "${formattedDate} ${formattedTime.toLowerCase()}",
+                                  )
+                                : senderMessagesCard(
+                                    context: context,
+                                    time:
+                                        "${formattedDate} ${formattedTime.toLowerCase()}",
+                                    message: chatData[index].message ?? "",
+                                    profileImage:
+                                        Image.asset(AppImages.avatar));
                           },
                         ),
                       )
                     ],
                   );
                 } else {
-                  return tryAgain(
-                      onTap: () => setState(() {}));
+                  return tryAgain(onTap: () => setState(() {}));
                 }
               }
               return customLoader();
-            })
-    );
+            }));
   }
 
   Widget senderMessagesCard({
@@ -373,8 +386,8 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Container(
-              width: AppSize.getWidth(context) / 2 ,
-              padding: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+              width: AppSize.getWidth(context) / 2,
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               decoration: BoxDecoration(
                   color: AppColor.customWhite,
                   borderRadius: BorderRadius.circular(11)),
@@ -386,7 +399,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             Padding(
               padding:
-              const EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 5),
+                  const EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 5),
               child: Text(time,
                   style: TextStyle(
                       color: AppColor.grey1,
@@ -486,9 +499,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Container(
                   clipBehavior: Clip.hardEdge,
                   width: AppSize.getWidth(context) / 2,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15)
-                  ),
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(15)),
                   child: FadeInImage.assetNetwork(
                     placeholder: AppImages.loader,
                     image: Endpoints.imageUrl + attachment.toString(),

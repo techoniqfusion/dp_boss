@@ -301,7 +301,7 @@ class _CreateRequestState extends State<CreateRequest> {
                                   )),
                                 ),
                                 Text(
-                                  "Choose File (JPG/PNG/PDF)",
+                                  "Choose File (JPG/PNG)",
                                   style: TextStyle(color: Colors.black),
                                 )
                               ],

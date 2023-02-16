@@ -50,10 +50,9 @@ class AuthProvider extends ChangeNotifier {
         await prefs.setBool("isLoggedIn", true);
         await prefs.setString("userToken", response.data['token']);
         final users = UserData.fromJson(response.data['data']);
-        
         await sqliteDb.addToUser(users);
         updateLoader(false);
-        Navigator.popAndPushNamed(context, AppScreen.dashboard);
+        Navigator.popAndPushNamed(context, AppScreen.dashboard, arguments: {'key' : 'Home'});
       }
       else{
         updateLoader(false);

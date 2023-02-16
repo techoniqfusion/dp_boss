@@ -11,31 +11,41 @@ class WinningHistory extends StatefulWidget {
 }
 
 class _WinningHistoryState extends State<WinningHistory> {
-
-  String? chooseData;
+  String? winningStartDate;
+  String? winningEndDate;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 20,),
-            Text("Select Date",style: TextStyle(
-              fontSize: 16,
-              fontFamily: AppFont.poppinsRegular
-            ),),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              "Select Date",
+              style:
+                  TextStyle(fontSize: 16, fontFamily: AppFont.poppinsRegular),
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Row(
               children: [
                 Expanded(
-                  child: SelectDateBox(chooseDate: chooseData,)
-                ),
-                dot(),dot(),dot(rightMargin: 5),
+                    child: SelectDateBox(
+                  chooseDate: winningStartDate,
+                )),
+                dot(),
+                dot(),
+                dot(rightMargin: 5),
                 Expanded(
-                    child: SelectDateBox(chooseDate: chooseData,)
-                ),
+                    child: SelectDateBox(
+                  chooseDate: winningEndDate,
+                )),
               ],
             )
           ],

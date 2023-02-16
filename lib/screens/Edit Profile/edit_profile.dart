@@ -19,6 +19,7 @@ import '../../Providers/Profile Update Provider/profile_update_provider.dart';
 import '../../model/StateModel.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_images.dart';
+import '../../utils/app_route.dart';
 import '../../utils/db_helper.dart';
 
 class EditProfile extends StatefulWidget {
@@ -106,305 +107,335 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProfileUpdateProvider>(context, listen: false);
-    return Scaffold(
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-        child: CustomButton(
-            onPressed: () async {
-              // SharedPreferences prefs = await SharedPreferences.getInstance();
-              // var authToken = prefs.getString("userToken");
-              // print("user token ${authToken}");
-              var isValidate = formKey.currentState?.validate();
-              if (isValidate != null && isValidate == true) {
-                var formData = FormData.fromMap({
-                  "email": emailController.text,
-                  "state": selectedState,
-                  "dob": dobController.text,
-                  "gender": selectedGender,
-                  "city": selectedCity,
-                  "address": addressController.text,
-                });
-                provider.updateProfile(context, formData);
-                FocusScope.of(context).unfocus();
-              }
-            },
-            isLoading:
-                context.watch<ProfileUpdateProvider>().profileUpdateLoader,
-            backgroundColor:
-                MaterialStateProperty.all<Color>(AppColor.lightYellow),
-            buttonText: "Submit"),
-      ),
-      appBar: AppBar(
-        elevation: 1,
-        backgroundColor: Colors.white,
-        leading: iconCard(
-            icon: SvgPicture.asset(AppImages.backIcon),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
-        title: const Text(
-          "Update Profile",
-          style: TextStyle(
-              fontFamily: AppFont.poppinsMedium,
-              fontSize: 14,
-              color: AppColor.black),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushNamedAndRemoveUntil(
+            context, AppScreen.dashboard, (route) => false,
+            arguments: {'key': 'Profile'}).then((value) {
+          setState(() {});
+        });
+        return true;
+      },
+      child: Scaffold(
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+          child: CustomButton(
+              onPressed: () async {
+                // SharedPreferences prefs = await SharedPreferences.getInstance();
+                // var authToken = prefs.getString("userToken");
+                // print("user token ${authToken}");
+                var isValidate = formKey.currentState?.validate();
+                if (isValidate != null && isValidate == true) {
+                  var formData = FormData.fromMap({
+                    "email": emailController.text,
+                    "state": selectedState,
+                    "dob": dobController.text,
+                    "gender": selectedGender,
+                    "city": selectedCity,
+                    "address": addressController.text,
+                  });
+                  provider.updateProfile(context, formData);
+                  FocusScope.of(context).unfocus();
+                }
+              },
+              isLoading:
+                  context.watch<ProfileUpdateProvider>().profileUpdateLoader,
+              backgroundColor:
+                  MaterialStateProperty.all<Color>(AppColor.lightYellow),
+              buttonText: "Submit"),
         ),
-      ),
-      body: FutureBuilder(
-          future: getUserData(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var data = snapshot.data as UserData;
-              print("mobile number => ${data.mobile}");
+        appBar: AppBar(
+          elevation: 1,
+          backgroundColor: Colors.white,
+          leading: iconCard(
+              icon: SvgPicture.asset(AppImages.backIcon),
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(context, AppScreen.dashboard,
+                        (route) => false,
+                    arguments: {'key' : 'Profile'});
+              }),
+          title: const Text(
+            "Update Profile",
+            style: TextStyle(
+                fontFamily: AppFont.poppinsMedium,
+                fontSize: 14,
+                color: AppColor.black),
+          ),
+        ),
+        body: FutureBuilder(
+            future: getUserData(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var data = snapshot.data as UserData;
+                print("mobile number => ${data.mobile}");
 
-              if(data.email != null && data.email != "null"){
-                emailController.text = data.email.toString();
-              }
+                if (data.email != null && data.email != "null") {
+                  emailController.text = data.email.toString();
+                }
 
-              if(data.dob != null && data.dob != "null"){
-                dobController.text = data.dob.toString();
-              }
+                if (data.dob != null && data.dob != "null") {
+                  dobController.text = data.dob.toString();
+                }
 
-              if(data.address != null && data.address != "null"){
-                addressController.text = data.address.toString();
-              }
+                if (data.address != null && data.address != "null") {
+                  addressController.text = data.address.toString();
+                }
 
-              if (data.gender != null && data.gender != "null") {
-                selectedGender = data.gender;
-              }
-              if (data.city != null && data.city != "null") {
-                print("selected city val is ${data.city}");
-                selectedCity = data.city;
-              }
-              if (data.state != null && data.state != "null") {
-                print("selected state val is ${data.state}");
-                selectedState = data.state;
-                selectedStateIndex = newStateData.indexWhere(
-                        (val) => val.state == selectedState);
-                cityData = newStateData[selectedStateIndex].districts!;
-              }
-              // print("selected state data  $newStateData");
-              // print("selected city data  $cityData");
-              return Form(
-                key: formKey,
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-                  children: [
-                    const Text(
-                      "Edit",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: AppColor.black,
-                          fontSize: 20,
-                          fontFamily: AppFont.poppinsSemiBold),
-                    ),
-                    textHeading(text: "Name"),
-                    CustomTextField(
-                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z]+|\s")),],
-                      keyboardType: TextInputType.text,
-                      controller: fullNameController,
-                      validator: Validation.validate,
-                      horizontalContentPadding: 30,
-                      hintText: "Enter Full Name",
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    textHeading(text: "Email"),
-
-                    CustomTextField(
-                      controller: emailController,
-                      validator: Validation.validateEmail,
-                      horizontalContentPadding: 30,
-                      hintText: "Enter Email",
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    textHeading(text: "Mobile"),
-                    CustomTextField(
-                      controller: mobileNumberController,
-                      readOnly: true,
-                      horizontalContentPadding: 30,
-                      hintText: "Enter Mobile Number",
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    textHeading(text: "Gender"),
-
-                    /// Select Gender Dropdown
-                    StatefulBuilder(builder: (context, setDropDown) {
-                      return CustomDropdown(
-                        hint: const Text("select gender"),
-                        validator: (value) =>
-                            value == null ? "Select gender" : null,
-                        // dropdownColor: Colors.blueAccent,
-                        value: selectedGender,
-                        onChanged: (newValue) {
-                          setDropDown(() {
-                            selectedGender = newValue.toString();
-                          });
-                        },
-                        items: genderItems,
-                      );
-                    }),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    textHeading(text: "DOB"),
-                    CustomTextField(
-                      readOnly: true,
-                      validator: Validation.validate,
-                      controller: dobController,
-                      horizontalContentPadding: 30,
-                      hintText: "Enter DOB",
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.only(right: 5.0),
-                        child: IconButton(
-                            onPressed: () {
-                              _selectDate(context);
-                            },
-                            icon: const Icon(
-                              Icons.calendar_today_outlined,
-                              color: AppColor.customGrey,
-                            )),
+                if (data.gender != null && data.gender != "null") {
+                  selectedGender = data.gender;
+                }
+                if (data.city != null && data.city != "null") {
+                  print("selected city val is ${data.city}");
+                  selectedCity = data.city;
+                }
+                if (data.state != null && data.state != "null") {
+                  print("selected state val is ${data.state}");
+                  selectedState = data.state;
+                  selectedStateIndex = newStateData
+                      .indexWhere((val) => val.state == selectedState);
+                  cityData = newStateData[selectedStateIndex].districts!;
+                }
+                // print("selected state data  $newStateData");
+                // print("selected city data  $cityData");
+                return Form(
+                  key: formKey,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    children: [
+                      const Text(
+                        "Edit",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: AppColor.black,
+                            fontSize: 20,
+                            fontFamily: AppFont.poppinsSemiBold),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    textHeading(text: "Address"),
-                    CustomTextField(
-                      validator: Validation.validate,
-                      controller: addressController,
-                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z\d]+|\s")),],
-                      // verticalContentPadding: 10,
-                      keyboardType: TextInputType.multiline,
-                      horizontalContentPadding: 30,
-                      hintText: "Enter Address",
-                    ),
 
-                    /// Select City Dropdown
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    textHeading(text: "Select State"),
+                      textHeading(text: "Name"),
 
-                    StatefulBuilder(builder: (context, setDropDown) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CustomDropdown(
-                            hint: const Text("choose state"),
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Required';
-                              }
-                              return null;
-                            },
-                            value: selectedState,
-                            onChanged: (val) {
-                              setDropDown(() {
-                                selectedState = val.toString();
-                                selectedStateIndex = newStateData.indexWhere(
-                                    (val) => val.state == selectedState);
-                                cityData =
-                                    newStateData[selectedStateIndex].districts!;
-                                selectedCity = null;
-                              });
-                              print(
-                                  "city data length ${cityData.length} and $selectedState");
-                            },
-                            items: newStateData
-                                .map((item) => DropdownMenuItem<String>(
-                                      value: item.state,
-                                      child: Text(
-                                        '${item.state}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          textHeading(text: "Select City"),
-                          CustomDropdown(
-                            // autovalidateMode:
-                            //     AutovalidateMode.onUserInteraction,
-                            hint: const Text("choose city"),
-                            validator: (value) =>
-                                value == null ? "Select City" : null,
-                            value: selectedCity,
-                            onChanged: selectedState != null ? (val) {
-                              setDropDown(() {
-                                selectedCity = val.toString();
-                              });
-                              print("selected city $selectedCity");
-
-                            } : null,
-                            items: cityData.map((item) {
-                                    // print('city list $item');
-                                    return DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(
-                                        item,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList()
-                          )
+                      /// Full Name TextField
+                      CustomTextField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r"[a-zA-Z]+|\s")),
                         ],
-                      );
-                    }),
+                        keyboardType: TextInputType.text,
+                        controller: fullNameController,
+                        validator: Validation.validate,
+                        horizontalContentPadding: 30,
+                        hintText: "Enter Full Name",
+                      ),
 
-                    // CustomTextField(
-                    //   controller: stateController..text = data.state.toString(),
-                    //   validator: validate,
-                    //   // verticalContentPadding: 10,
-                    //   horizontalContentPadding: 30,
-                    //   hintText: "State",
-                    // ),
-                  ],
-                ),
-              );
-            } else {
-              return customLoader();
-            }
-          }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      textHeading(text: "Email"),
+
+                      /// Email TextField
+                      CustomTextField(
+                        controller: emailController,
+                        validator: Validation.validateEmail,
+                        horizontalContentPadding: 30,
+                        hintText: "Enter Email",
+                      ),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      textHeading(text: "Mobile"),
+
+                      /// Mobile TextField
+                      CustomTextField(
+                        controller: mobileNumberController,
+                        readOnly: true,
+                        horizontalContentPadding: 30,
+                        hintText: "Enter Mobile Number",
+                      ),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      textHeading(text: "Gender"),
+
+                      /// Select Gender Dropdown
+                      StatefulBuilder(builder: (context, setDropDown) {
+                        return CustomDropdown(
+                          hint: const Text("select gender"),
+                          validator: (value) =>
+                              value == null ? "Select gender" : null,
+                          // dropdownColor: Colors.blueAccent,
+                          value: selectedGender,
+                          onChanged: (newValue) {
+                            setDropDown(() {
+                              selectedGender = newValue.toString();
+                            });
+                          },
+                          items: genderItems,
+                        );
+                      }),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      textHeading(text: "DOB"),
+
+                      /// DOB TextField
+                      CustomTextField(
+                        readOnly: true,
+                        validator: Validation.validate,
+                        controller: dobController,
+                        horizontalContentPadding: 30,
+                        hintText: "Enter DOB",
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(right: 5.0),
+                          child: IconButton(
+                              onPressed: () {
+                                _selectDate(context);
+                              },
+                              icon: const Icon(
+                                Icons.calendar_today_outlined,
+                                color: AppColor.customGrey,
+                              )),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      textHeading(text: "Address"),
+
+                      /// Address TextField
+                      CustomTextField(
+                        validator: Validation.validate,
+                        controller: addressController,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r"[a-zA-Z\d]+|\s")),
+                        ],
+                        // verticalContentPadding: 10,
+                        keyboardType: TextInputType.multiline,
+                        horizontalContentPadding: 30,
+                        hintText: "Enter Address",
+                      ),
+
+                      /// Select City Dropdown
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      textHeading(text: "Select State"),
+
+                      StatefulBuilder(builder: (context, setDropDown) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomDropdown(
+                              hint: const Text("choose state"),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Required';
+                                }
+                                return null;
+                              },
+                              value: selectedState,
+                              onChanged: (val) {
+                                setDropDown(() {
+                                  selectedState = val.toString();
+                                  selectedStateIndex = newStateData.indexWhere(
+                                      (val) => val.state == selectedState);
+                                  cityData = newStateData[selectedStateIndex]
+                                      .districts!;
+                                  selectedCity = null;
+                                });
+                              },
+                              items: newStateData
+                                  .map((item) => DropdownMenuItem<String>(
+                                        value: item.state,
+                                        child: Text(
+                                          '${item.state}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ))
+                                  .toList(),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            textHeading(text: "Select City"),
+
+                            CustomDropdown(
+                                // autovalidateMode:
+                                //     AutovalidateMode.onUserInteraction,
+                                hint: const Text("choose city"),
+                                validator: (value) =>
+                                    value == null ? "Select City" : null,
+                                value: selectedCity,
+                                onChanged: selectedState != null
+                                    ? (val) {
+                                        setDropDown(() {
+                                          selectedCity = val.toString();
+                                        });
+                                        print("selected city $selectedCity");
+                                      }
+                                    : null,
+                                items: cityData.map((item) {
+                                  // print('city list $item');
+                                  return DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  );
+                                }).toList())
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                );
+              } else {
+                return customLoader();
+              }
+            }),
+      ),
     );
   }
 
   _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime(selectedDate.year - 18),
-        firstDate: DateTime(selectedDate.year - 75),
-        lastDate: DateTime(selectedDate.year - 18),
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.light(
-                primary: AppColor.yellow,
-                onPrimary: AppColor.white,
-                onSurface: AppColor.black,
-              ),
-              // textButtonTheme: TextButtonThemeData(
-              //   style: TextButton.styleFrom(
-              //     primary: Colors.red, // button text color
-              //   ),
-              // ),
+      context: context,
+      initialDate: DateTime(selectedDate.year - 18),
+      firstDate: DateTime(selectedDate.year - 75),
+      lastDate: DateTime(selectedDate.year - 18),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColor.yellow,
+              onPrimary: AppColor.white,
+              onSurface: AppColor.black,
             ),
-            child: child!,
-          );
-        },
+            // textButtonTheme: TextButtonThemeData(
+            //   style: TextButton.styleFrom(
+            //     primary: Colors.red, // button text color
+            //   ),
+            // ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != selectedDate) {
       // setState(() {

@@ -111,8 +111,7 @@ class RegistrationProvider extends ChangeNotifier{
       rethrow;
     }
   }
-
-
+  
   /// Show/Hide loader functionality
   updateLoader(bool status) {
     buttonLoader = status;

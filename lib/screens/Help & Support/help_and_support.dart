@@ -1,10 +1,12 @@
+import 'package:dp_boss/Component/my_shimmer.dart';
+import 'package:dp_boss/utils/date_time_converter.dart';
 import 'package:dp_boss/utils/string_capitalize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../API Response Model/Support History All Data/support_history_all_data_model.dart';
 import '../../Component/custom_button.dart';
-import '../../Component/custom_loader.dart';
 import '../../Component/icon_card.dart';
 import '../../Component/try_again.dart';
 import '../../Providers/Support History All Data Provider/support_history_provider.dart';
@@ -72,6 +74,9 @@ class _HelpAndSupportState extends State<HelpAndSupport> {
                     padding: EdgeInsets.symmetric(horizontal: 15,vertical: 15),
                     itemCount: descendingOrder.length,
                     itemBuilder: (context, index) {
+                      var requestDate = DateTime.parse(descendingOrder[index].createdAt ?? "");
+                      var formattedTime = DateFormat.jm().format(requestDate);
+                      var formattedDate = extractDateFromDateTime(descendingOrder[index].createdAt ?? "", "d, MMM, y");
                       return GestureDetector(
                         onTap: (){
                           print("Support id => ${historyData[index].id}");
@@ -79,10 +84,10 @@ class _HelpAndSupportState extends State<HelpAndSupport> {
                         },
                         child: Container(
                             margin: EdgeInsets.only(bottom: 15),
-                            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
                             decoration: BoxDecoration(
                                 color: AppColor.customWhite,
-                                borderRadius: BorderRadius.circular(15)
+                                borderRadius: BorderRadius.circular(30)
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,7 +105,7 @@ class _HelpAndSupportState extends State<HelpAndSupport> {
                                         overflow: TextOverflow.ellipsis,
                                       ),),
 
-                                      Text(descendingOrder[index].createdAt.toString(),style: TextStyle(
+                                      Text("${formattedDate} | ${formattedTime}",style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 12,
                                       ),), //12th, Dec, 2022 | 09:00 AM"
@@ -112,9 +117,7 @@ class _HelpAndSupportState extends State<HelpAndSupport> {
                                         color: Colors.grey,
                                         fontSize: 12,
                                         fontFamily: AppFont.poppinsSemiBold,
-
                                       ),)
-
                                     ],
                                   ),
                                 ),
@@ -141,8 +144,7 @@ class _HelpAndSupportState extends State<HelpAndSupport> {
                     },) :
                   Center(child: Text("No request is created yet",style: TextStyle(
                       fontFamily: AppFont.poppinsSemiBold
-                  ),),)
-                  ,
+                  ),),),
                 );
               }
               else {
@@ -150,7 +152,7 @@ class _HelpAndSupportState extends State<HelpAndSupport> {
                     onTap: () => setState(() {}));
               }
             }
-            return customLoader();
+            return myShimmer();
           }
       ),
     );

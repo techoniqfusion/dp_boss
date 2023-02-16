@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:dp_boss/Component/otp_textfield.dart';
 import 'package:dp_boss/Providers/Recover%20Password%20Provider/recover_password_provider.dart';
 import 'package:dp_boss/Providers/Registration%20Provider/registration_provider.dart';
 import 'package:dp_boss/utils/replace_char.dart';
@@ -32,6 +31,7 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+
   final otpController = TextEditingController();
 
   var mobileNo = '';
@@ -40,9 +40,6 @@ class _OtpScreenState extends State<OtpScreen> {
   void initState() {
     context.read<AuthProvider>().startTimer();
     getMobileNumber().then((value) {
-      // widget.mobileNumber = value ?? "";
-      // print("mobile number $value");
-      // print("widget.isAppClosed  value => ${widget.isAppClosed}");
       if (widget.isAppClosed == false) {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         var formData = FormData.fromMap({"phone": value});
@@ -212,6 +209,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 ],
               ),
             ),
+
             const SizedBox(
               height: 20 + kBottomNavigationBarHeight,
             ),
@@ -230,12 +228,12 @@ class _OtpScreenState extends State<OtpScreen> {
                           otpController.text.length == 6) {
                         var response = await recoverPassProvider
                             .recoverPasswordVerification(context, formData);
-                        if(response['status_code'] == 200){
+                        if (response['status_code'] == 200) {
                           Navigator.pushNamedAndRemoveUntil(
-                              arguments: {
-                                "mobile" : widget.mobileNumber
-                              },
-                              context, AppScreen.changePassword, (route) => false);
+                              arguments: {"mobile": widget.mobileNumber},
+                              context,
+                              AppScreen.changePassword,
+                              (route) => false);
                         }
                         if (response['status_code'] == 201) {
                           otpController.clear();

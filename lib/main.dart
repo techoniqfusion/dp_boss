@@ -1,11 +1,14 @@
 import 'package:dp_boss/Providers/Add%20Upi%20Provider/add_upi_provider.dart';
 import 'package:dp_boss/Providers/Bank%20Details%20List%20Provider/bank_details_list_provider.dart';
 import 'package:dp_boss/Providers/Dashboard%20Provider/dashboard_provider.dart';
+import 'package:dp_boss/Providers/Deposit%20Summary%20Provider/deposit_summary_provider.dart';
+import 'package:dp_boss/Providers/Game%20Rate%20Provider/game_rate_provider.dart';
 import 'package:dp_boss/Providers/Points%20Provider/points_provider.dart';
 import 'package:dp_boss/Providers/Profile%20Update%20Provider/profile_update_provider.dart';
 import 'package:dp_boss/Providers/Recover%20Password%20Provider/recover_password_provider.dart';
 import 'package:dp_boss/Providers/Transaction%20History%20Provider/transaction_history_provider.dart';
-import 'package:dp_boss/Providers/Verificartion%20Provider/verification_provider.dart';
+import 'package:dp_boss/Providers/Verification%20Provider/verification_provider.dart';
+import 'package:dp_boss/Providers/Withdrawal%20All%20Data%20Provider/withdrawal_all_data_provider.dart';
 import 'package:dp_boss/screens/Dashboard/dashboard.dart';
 import 'package:dp_boss/screens/Login%20Screen/login_screen.dart';
 import 'package:dp_boss/screens/OTP%20Screen/otp_screen.dart';
@@ -154,6 +157,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => TransactionHistoryProvider()),
         ChangeNotifierProvider(create: (_) => AddUpiProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
+        ChangeNotifierProvider(create: (_) => DepositSummaryProvider()),
+        ChangeNotifierProvider(create: (_) => WithdrawalAllDataProvider()),
+        ChangeNotifierProvider(create: (_) => GameRateProvider()),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -166,7 +172,7 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         title: 'DP Boss',
         home: isLoggedIn
-            ? const Dashboard()
+            ? Dashboard(screenKey: 'Home')
             : isRegistered
                 ? OtpScreen()
                 : const LoginScreen(),

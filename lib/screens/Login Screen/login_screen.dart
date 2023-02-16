@@ -16,6 +16,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import '../../Component/custom_snackbar.dart';
 import '../../model/contact_detail_model.dart';
 import '../../model/device_info_model.dart';
 import '../../utils/app_color.dart';
@@ -29,6 +30,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
   String? _currentAddress;
   Position? _currentPosition;
   Map? _deviceInfo;
@@ -44,18 +46,14 @@ class _LoginScreenState extends State<LoginScreen> {
     LocationPermission permission;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text('Location permission is disabled. Please allow.')));
+      CustomSnackBar.mySnackBar(context, 'Location permission is disabled. Please allow.');
       return false;
     }
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text('Location permission is denied')));
+        CustomSnackBar.mySnackBar(context, 'Location permission is disabled. Please allow.');
         return false;
       }
     }
@@ -135,9 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
     var contactPermissionStatus = await _handleContactPermission();
     print("Contact permission status => $contactPermissionStatus");
     if (!contactPermissionStatus) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text('Contacts permission is denied, please allow.')));
+      CustomSnackBar.mySnackBar(
+          context, 'Contacts permission is denied, please allow.');
       return false;
     }
     try {
@@ -297,6 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                /// Login Button
                 CustomButton(
                   isLoading: context.watch<AuthProvider>().buttonLoader,
                   onPressed: () async {
@@ -305,22 +303,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     var permissionStatus = await _handleLocationPermission();
                     var contactStatus = await _handleContactPermission();
                     var isValidate = formKey.currentState?.validate();
-                    // print("on tap 0");
+                    print("on tap 0");
                     if (isValidate != null && isValidate == true) {
-                      // print("on tap 1");
+                      print("on tap 1");
                       if (permissionStatus && contactStatus) {
-                        // print("on tap 2");
+                        print("on tap 2");
                         await _getCurrentPosition();
-                        // print("on tap 3");
+                        print("on tap 3");
                         await getContactList();
-                        // print("on tap 4");
+                        print("on tap 4");
                         if (_currentPosition?.latitude == null &&
                             _currentPosition?.longitude == null) {
-                          // print("on tap 5");
+                          print("on tap 5");
                           setState(() {
                             isShowOverlayLoader = true;
                           });
-                          // print("on tap 6");
+                          print("on tap 6");
                           print(
                               "current_latitude => ${_currentPosition?.latitude}");
                           print(
@@ -329,7 +327,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             setState(() {
                               isShowOverlayLoader = false;
                             });
-                            // print("on tap 7");
+                            print("on tap 7");
                             print(
                                 "user current lat ${_currentPosition?.latitude}");
                             print(
@@ -350,6 +348,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 "device_contact": phoneContactList,
                                 "fcmtoken": tokenFcm
                               });
+                              print("testing");
                               provider.login(context, formData);
                             }
                             // print("user current address $_currentAddress");
@@ -363,6 +362,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialStateProperty.all<Color>(AppColor.lightYellow),
                   buttonText: "Login",
                 ),
+
                 const SizedBox(
                   height: 20,
                 ),
@@ -373,9 +373,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontSize: 14,
                       fontFamily: AppFont.poppinsMedium),
                 ),
+
                 const SizedBox(
                   height: 2,
                 ),
+
                 GestureDetector(
                   onTap: () {
                     Navigator.pushNamed(context, AppScreen.registration);

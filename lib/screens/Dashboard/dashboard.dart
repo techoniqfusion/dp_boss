@@ -13,7 +13,8 @@ import '../../utils/app_route.dart';
 import 'Home Screen/home_view.dart';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+  String? screenKey;
+   Dashboard({Key? key, required this.screenKey}) : super(key: key);
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -26,12 +27,13 @@ class _DashboardState extends State<Dashboard> {
       child: const HomeView(),
       title: "Home",
       bottomIcon: AppImages.homeIcon,
-      isSelect: true,
+      isSelect: true
     ),
     BottomBar(
         child: const ProfileView(),
         title: "Profile",
-        bottomIcon: AppImages.profileIcon),
+        bottomIcon: AppImages.profileIcon,
+    ),
     BottomBar(
       child: const AccountView(),
       title: "Account",
@@ -46,10 +48,19 @@ class _DashboardState extends State<Dashboard> {
   ];
 
 
-
   @override
   Widget build(BuildContext context) {
+
+    for (var element in list) {
+      if(element.title == widget.screenKey){
+        element.isSelect = true;
+      }else{
+        element.isSelect = false;
+      }
+    }
+
     var selectedPage = list.firstWhere((element) => element.isSelect);
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -128,10 +139,11 @@ class _DashboardState extends State<Dashboard> {
                 hoverColor: Colors.transparent,
                 //enableFeedback: false,
                   onTap: () {
-                    for (var element in list) {
-                      element.isSelect = false;
-                    }
-                    item.isSelect = true;
+                    // for (var element in list) {
+                    //   element.isSelect = false;
+                    // }
+                    // item.isSelect = true;
+                    widget.screenKey = item.title;
                     setState(() {});
                   },
                   child: Column(

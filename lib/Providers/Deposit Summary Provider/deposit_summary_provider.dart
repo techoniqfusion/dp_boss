@@ -1,21 +1,21 @@
-import 'package:dp_boss/API%20Response%20Model/Support%20History%20ID%20Model/support_history_id_model.dart';
 import 'package:flutter/material.dart';
 import '../../API Integration/call_api.dart';
+import 'package:dio/dio.dart';
 import '../../Component/pop_up.dart';
 import '../../utils/logout_user.dart';
 
-class SupportHistoryIdProvider extends ChangeNotifier{
+class DepositSummaryProvider extends ChangeNotifier{
   final appAPi = AppApi();
-  List<SupportHistoryIdModel> supportHistoryIDList = [];
+  bool isShowLoader = false;
 
-  Future supportDataId(BuildContext context, String supportId) async{
+  Future manualDepositAmount(BuildContext context, FormData data) async{
     try{
-      final response = await appAPi.supportData(supportId);
+      updateLoader(true);
+      final response = await appAPi.manualDepositApi(body: data);
+      print("api response data");
+      print(response.data);
       if(response.data['status'] == true){
-        List temp = response.data['SupportHistory'];
-        supportHistoryIDList = temp.map((e) => SupportHistoryIdModel.fromJson(e)).toList();
-        // notifyListeners();
-        return supportHistoryIDList;
+        updateLoader(false);
       }
       else {
         if(response.data['status_code'] == 401){
@@ -31,6 +31,7 @@ class SupportHistoryIdProvider extends ChangeNotifier{
           );
         }
         else{
+          updateLoader(false);
           popUp(
             context: context, title: response.data['message'], // show popUp
             actions: [
@@ -44,10 +45,18 @@ class SupportHistoryIdProvider extends ChangeNotifier{
           );
         }
       }
+      return response.data;
     }
     catch (error) {
-      print("Support History ID API error $error");
+      updateLoader(false);
+      print("Manual Deposit API error $error");
       rethrow;
     }
+  }
+
+  /// Show/Hide loader functionality
+  updateLoader(bool status) {
+    isShowLoader = status;
+    notifyListeners();
   }
 }

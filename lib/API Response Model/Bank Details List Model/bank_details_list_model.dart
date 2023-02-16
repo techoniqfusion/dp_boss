@@ -43,6 +43,7 @@ class Data {
   String? bankName;
   String? bankBranchName;
   String? status;
+  bool? isSelected;
 
   Data(
       {this.id,
@@ -51,7 +52,9 @@ class Data {
         this.accountIfscCode,
         this.bankName,
         this.bankBranchName,
-        this.status});
+        this.status,
+        this.isSelected = false
+      });
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];

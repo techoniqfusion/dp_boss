@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:dp_boss/API%20Integration/call_api.dart';
 import 'package:dp_boss/Component/custom_textfield.dart';
 import 'package:dp_boss/utils/app_font.dart';
 import 'package:dp_boss/utils/validation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,11 +12,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../Component/custom_button.dart';
+import '../../Component/custom_loader.dart';
 import '../../Component/icon_card.dart';
 import '../../Component/pop_up.dart';
-import '../../Providers/Verificartion Provider/verification_provider.dart';
+import '../../Component/try_again.dart';
+import '../../Providers/Verification Provider/verification_provider.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_images.dart';
+import '../../utils/app_route.dart';
 import '../../utils/app_size.dart';
 
 class VerifyScreen extends StatefulWidget {
@@ -32,7 +35,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
   var panNoController = TextEditingController();
   bool isCompleted = false; //check completeness of inputs
 
-  final formKey = GlobalKey<FormState>(); //form object to be used for form validation
+  final formKey =
+      GlobalKey<FormState>(); //form object to be used for form validation
   final form2Key = GlobalKey<FormState>();
 
   File? panFrontImg;
@@ -43,6 +47,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   XFile? aadhaarBackImgFile;
   File? selfieImg;
   XFile? selfieImgFile;
+  final appApi = AppApi();
 
   final picker = ImagePicker();
 
@@ -190,150 +195,248 @@ class _VerifyScreenState extends State<VerifyScreen> {
     }
   }
 
+  Future getVerification() async {
+    final response = await appApi.getVerificationDataApi();
+    return response.data;
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<VerificationProvider>(context, listen: false);
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        title: const Text(
-          "Verify",
-          style: TextStyle(
-              fontFamily: AppFont.poppinsMedium,
-              fontSize: 14,
-              color: AppColor.black),
-        ),
-        backgroundColor: Colors.white,
-        leading: iconCard(
-            icon: SvgPicture.asset(AppImages.backIcon),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
-      ),
-      body: Stepper(
-        elevation: 0,
-        steps: getSteps(),
-        type: StepperType.horizontal,
-        currentStep: currentStep,
-        // onStepTapped: (step) {
-        //   formKey.currentState!.validate(); //this will trigger validation
-        //   setState(() {
-        //     currentStep = step;
-        //   });
-        // },
-        onStepContinue: () async {
-          var isValidate = currentStep == 0
-              ? formKey.currentState?.validate()
-              : form2Key.currentState?.validate();
-          print("current step value $currentStep");
-          final isLastStep = currentStep == getSteps().length - 1;
-          if (isLastStep) {
-            print("complete");
-            if (selfieImg == null) {
-              popUp(context: context, title: "Fill All Fields", actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("okay"))
-              ]);
-            } else {
-              String? aadhaarFrontFileName;
-              String? aadhaarBackFileName;
-              String? panCardFileName;
-              String? selfieFileName;
-              if (aadhaarFrontImg != null &&
-                  aadhaarBackImg != null &&
-                  panFrontImg != null &&
-                  selfieImg != null) {
-                aadhaarFrontFileName = aadhaarFrontImg?.path.split('/').last;
-                aadhaarBackFileName = aadhaarBackImg?.path.split('/').last;
-                panCardFileName = panFrontImg?.path.split('/').last;
-                selfieFileName = selfieImg?.path.split('/').last;
-                var formData = FormData.fromMap({
-                  "aadhar_card_number": aadhaarNoController.text,
-                  "aadhar_card_front": await MultipartFile.fromFile(
-                      aadhaarFrontImg!.path,
-                      filename: aadhaarFrontFileName),
-                  "aadhar_card_back": await MultipartFile.fromFile(
-                      aadhaarBackImg!.path,
-                      filename: aadhaarBackFileName),
-                  "pan_card_number": panNoController.text,
-                  "pan_card_front": await MultipartFile.fromFile(
-                      panFrontImg!.path,
-                      filename: panCardFileName),
-                  "user_selfie": await MultipartFile.fromFile(selfieImg!.path,
-                      filename: selfieFileName)
-                });
-                final response = await provider.verification(context, formData);
-                if (response.data['status'] == 200) {
-                  showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) => CupertinoAlertDialog(
-                        title: Text(
-                          response.data['mess'],
-                          textAlign: TextAlign.center,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text("okay"),
-                          ),
-                        ]),
-                  );
-                  setState(() {});
-                }
+    var fontStyle = TextStyle(
+        color: AppColor.black,
+        fontSize: 14,
+        fontFamily: AppFont.poppinsSemiBold);
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushNamedAndRemoveUntil(
+            context, AppScreen.dashboard, (route) => false,
+            arguments: {'key': 'Profile'});
+        return true;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            elevation: 1,
+            title: const Text(
+              "Verify",
+              style: TextStyle(
+                  fontFamily: AppFont.poppinsMedium,
+                  fontSize: 14,
+                  color: AppColor.black),
+            ),
+            backgroundColor: Colors.white,
+            leading: iconCard(
+                icon: SvgPicture.asset(AppImages.backIcon),
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, AppScreen.dashboard, (route) => false,
+                      arguments: {'key': 'Profile'});
+                }),
+          ),
+          body: FutureBuilder(
+            future: getVerification(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) if (snapshot
+                  .hasData) {
+                var response = snapshot.data;
+                return response['status_code'] == 203
+                    ? Stepper(
+                        elevation: 0,
+                        steps: getSteps(),
+                        type: StepperType.horizontal,
+                        currentStep: currentStep,
+                        // onStepTapped: (step) {
+                        //   formKey.currentState!.validate(); //this will trigger validation
+                        //   setState(() {
+                        //     currentStep = step;
+                        //   });
+                        // },
+                        onStepContinue: () async {
+                          var isValidate = currentStep == 0
+                              ? formKey.currentState?.validate()
+                              : form2Key.currentState?.validate();
+                          print("current step value $currentStep");
+                          final isLastStep =
+                              currentStep == getSteps().length - 1;
+                          if (isLastStep) {
+                            print("complete");
+                            if (selfieImg == null) {
+                              popUp(
+                                  context: context,
+                                  title: "Fill All Fields",
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("okay"))
+                                  ]);
+                            } else {
+                              String? aadhaarFrontFileName;
+                              String? aadhaarBackFileName;
+                              String? panCardFileName;
+                              String? selfieFileName;
+                              if (aadhaarFrontImg != null &&
+                                  aadhaarBackImg != null &&
+                                  panFrontImg != null &&
+                                  selfieImg != null) {
+                                aadhaarFrontFileName =
+                                    aadhaarFrontImg?.path.split('/').last;
+                                aadhaarBackFileName =
+                                    aadhaarBackImg?.path.split('/').last;
+                                panCardFileName =
+                                    panFrontImg?.path.split('/').last;
+                                selfieFileName =
+                                    selfieImg?.path.split('/').last;
+                                var formData = FormData.fromMap({
+                                  "aadhar_card_number":
+                                      aadhaarNoController.text,
+                                  "aadhar_card_front":
+                                      await MultipartFile.fromFile(
+                                          aadhaarFrontImg!.path,
+                                          filename: aadhaarFrontFileName),
+                                  "aadhar_card_back":
+                                      await MultipartFile.fromFile(
+                                          aadhaarBackImg!.path,
+                                          filename: aadhaarBackFileName),
+                                  "pan_card_number": panNoController.text,
+                                  "pan_card_front":
+                                      await MultipartFile.fromFile(
+                                          panFrontImg!.path,
+                                          filename: panCardFileName),
+                                  "user_selfie": await MultipartFile.fromFile(
+                                      selfieImg!.path,
+                                      filename: selfieFileName)
+                                });
+                                final response = await provider.verification(
+                                    context, formData);
+                                print("form data ${formData.fields}");
+                                if (response.data['status'] == 200) {
+                                  popUp(
+                                      context: context,
+                                      title: response.data['mess'],
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pushNamedAndRemoveUntil(
+                                                context,
+                                                AppScreen.dashboard,
+                                                (route) => false,
+                                                arguments: {'key': 'Profile'});
+                                          },
+                                          child: const Text("okay"),
+                                        ),
+                                      ]);
+                                }
+                              }
+                            }
+                          } else if (currentStep == 0 &&
+                                  (aadhaarFrontImg == null ||
+                                      aadhaarBackImg == null ||
+                                      aadhaarNoController.text.isEmpty) ||
+                              currentStep == 1 &&
+                                  (panFrontImg == null ||
+                                      panNoController.text.isEmpty)) {
+                            popUp(
+                                context: context,
+                                title: "Fill All Fields",
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("okay"))
+                                ]);
+                          } else if (isValidate != null &&
+                              !isValidate &&
+                              currentStep == 0) {
+                            popUp(
+                                context: context,
+                                title: "Invalid Aadhaar Number",
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("okay"))
+                                ]);
+                          } else if (isValidate != null &&
+                              !isValidate &&
+                              currentStep == 1) {
+                            popUp(
+                                context: context,
+                                title: "Invalid PAN Number",
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("okay"))
+                                ]);
+                          } else {
+                            print("is last step $isLastStep");
+                            setState(() {
+                              currentStep += 1;
+                            });
+                            print("after on tap ${currentStep}");
+                          }
+                        },
+                        onStepCancel: currentStep == 0
+                            ? null
+                            : () {
+                                setState(() {
+                                  currentStep -= 1;
+                                });
+                              },
+                        controlsBuilder: controlBuilder,
+                      )
+                    : response['User_status'] == "Success"
+                        ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.verified,color: AppColor.neon,size: 40,),
+                            SizedBox(height: 5,),
+                            Center(
+                                child: Text(
+                                  response["message"],
+                                  style: fontStyle,
+                                ),
+                              ),
+                          ],
+                        )
+                        : response['User_status'] == "Pending"
+                            ? Center(
+                                child: Text(
+                                  response["message"],
+                                  style: fontStyle,
+                                ),
+                              )
+                            : response['User_status'] == "Reject"
+                                ? Center(
+                                    child: Text(
+                                      response["message"],
+                                      style: fontStyle,
+                                    ),
+                                  )
+                                : response['User_status'] == "Pen_Pending"
+                                    ? Center(
+                                        child: Text(
+                                          response["message"],
+                                          style: fontStyle,
+                                        ),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                          response["message"],
+                                          style: fontStyle,
+                                        ),
+                                      );
+              } else {
+                return tryAgain(onTap: () => setState(() {}));
               }
-            }
-          } else if (currentStep == 0 &&
-                  (aadhaarFrontImg == null ||
-                      aadhaarBackImg == null ||
-                      aadhaarNoController.text.isEmpty) ||
-              currentStep == 1 &&
-                  (panFrontImg == null || panNoController.text.isEmpty)) {
-            popUp(context: context, title: "Fill All Fields", actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("okay"))
-            ]);
-          } else if (isValidate != null && !isValidate && currentStep == 0) {
-            popUp(context: context, title: "Invalid Aadhaar Number", actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("okay"))
-            ]);
-          } else if (isValidate != null && !isValidate && currentStep == 1) {
-            popUp(context: context, title: "Invalid PAN Number", actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("okay"))
-            ]);
-          } else {
-            print("is last step $isLastStep");
-            setState(() {
-              currentStep += 1;
-            });
-            print("after on tap ${currentStep}");
-          }
-        },
-        onStepCancel: currentStep == 0
-            ? null
-            : () {
-                setState(() {
-                  currentStep -= 1;
-                });
-              },
-        controlsBuilder: controlBuilder,
-      ),
+              return customLoader();
+            },
+          )),
     );
   }
 
@@ -345,7 +448,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           isLoading: context.watch<VerificationProvider>().buttonLoader,
           height: 18,
           onPressed: details.onStepContinue,
-          buttonText: "Continue",
+          buttonText: currentStep == 2 ? "Submit" : "Continue",
           backgroundColor:
               MaterialStateProperty.all<Color>(AppColor.lightYellow),
         ),
@@ -406,7 +509,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
                               borderRadius: BorderRadius.circular(6.0)),
                           child: Image.file(
                             aadhaarFrontImg!,
-                            // File(image?.path),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -477,7 +579,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
                               borderRadius: BorderRadius.circular(6.0)),
                           child: Image.file(
                             aadhaarBackImg!,
-                            // File(image?.path),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -575,7 +676,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
                                 borderRadius: BorderRadius.circular(6.0)),
                             child: Image.file(
                               panFrontImg!,
-                              // File(image?.path),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -657,8 +757,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                                 borderRadius: BorderRadius.circular(6.0)),
                             child: Image.file(
                               selfieImg!,
-                              // File(image?.path),
-                              fit: BoxFit.cover,
+                              // fit: BoxFit.cover,
                             ),
                           ),
                           Align(

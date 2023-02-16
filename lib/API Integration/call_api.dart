@@ -95,7 +95,7 @@ class AppApi {
     }
   }
 
-  /// Withdrawal Request API            -- not implement
+  /// Withdrawal Request API
   Future withdrawalRequestApi({required FormData body}){
     try {
       final response = dioClient.post("withdrawal/withdrawal-request",data: body);
@@ -106,7 +106,7 @@ class AppApi {
     }
   }
 
-  /// Withdrawal All Data API           -- not implement
+  /// Withdrawal All Data API
   Future withdrawalAllDataApi(){
     try {
       final response = dioClient.get("withdrawal/withdrawal-all-data");
@@ -231,6 +231,39 @@ class AppApi {
   Future dashboardApi(){
     try{
       final response = dioClient.get("user/dashboard");
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
+
+  /// Manual Deposit API
+  Future manualDepositApi({required FormData body}){
+    try{
+      final response = dioClient.post("deposit/deposit-amount", data: body);
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
+
+  /// Get Verification Data API
+  Future getVerificationDataApi(){
+    try{
+      final response = dioClient.get("verification/verification-data");
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
+
+  /// Get Point Rate API
+  Future pointRate(){
+    try{
+      final response = dioClient.get("transfer/point-rate");
       return response;
     } on DioError catch(error){
       final errorMessage = DioExceptions.fromDioError(error).toString();

@@ -1,21 +1,21 @@
-import 'package:dp_boss/API%20Response%20Model/Support%20History%20ID%20Model/support_history_id_model.dart';
+import 'package:dp_boss/API%20Response%20Model/Game%20Rate%20Model/game_rate_model.dart';
 import 'package:flutter/material.dart';
 import '../../API Integration/call_api.dart';
 import '../../Component/pop_up.dart';
 import '../../utils/logout_user.dart';
 
-class SupportHistoryIdProvider extends ChangeNotifier{
-  final appAPi = AppApi();
-  List<SupportHistoryIdModel> supportHistoryIDList = [];
+class GameRateProvider extends ChangeNotifier{
 
-  Future supportDataId(BuildContext context, String supportId) async{
+  final appAPi = AppApi();
+  List<GameRateModel> gameRateList = [];
+
+  Future gameRate(BuildContext context) async{
     try{
-      final response = await appAPi.supportData(supportId);
+      final response = await appAPi.pointRate();
       if(response.data['status'] == true){
-        List temp = response.data['SupportHistory'];
-        supportHistoryIDList = temp.map((e) => SupportHistoryIdModel.fromJson(e)).toList();
-        // notifyListeners();
-        return supportHistoryIDList;
+        List temp = response.data['data'];
+        gameRateList = temp.map((e) => GameRateModel.fromJson(e)).toList();
+        return gameRateList;
       }
       else {
         if(response.data['status_code'] == 401){
@@ -46,7 +46,7 @@ class SupportHistoryIdProvider extends ChangeNotifier{
       }
     }
     catch (error) {
-      print("Support History ID API error $error");
+      print("Game Rate API error $error");
       rethrow;
     }
   }

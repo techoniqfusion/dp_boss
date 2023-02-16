@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:dp_boss/Component/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -125,7 +125,7 @@ class _ReferAndEarnState extends State<ReferAndEarn> {
                                     keyboardType: TextInputType.number,
                                     inputFormatters: [
                                       FilteringTextInputFormatter.allow(
-                                        RegExp(r"[0-9]"),
+                                        RegExp(r"\d"),
                                       )
                                     ],
                                     validator: validate,
@@ -143,9 +143,12 @@ class _ReferAndEarnState extends State<ReferAndEarn> {
                                       buttonText: 'Claim Amount',
                                       onPressed: () async {
                                         formKey.currentState!.validate();
-                                        var data = FormData.fromMap({
-                                          "amount" : referralAmountController.text
-                                        });
+
+                                        // var data = FormData.fromMap({
+                                        //   "amount" : referralAmountController.text
+                                        // });
+
+
                                         // final response = await appApi.claimAmountApi(body: data);
                                         // if(referralAmountController.text.isNotEmpty){
                                         //   if(response.data['status']){
@@ -244,17 +247,7 @@ class _ReferAndEarnState extends State<ReferAndEarn> {
               onTap: () {
                 Clipboard.setData(
                     ClipboardData(text: "refer"));
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(
-                  backgroundColor: AppColor.white,
-                  behavior: SnackBarBehavior.floating,
-                  content: Text(
-                    "Copy to Clipboard",
-                    style: TextStyle(
-                        color: AppColor.darkGrey,
-                        fontFamily: AppFont.poppinsSemiBold),
-                  ),
-                ));
+                CustomSnackBar.mySnackBar(context, "Copy to Clipboard");
               },
               child: DottedBorder(
                 dashPattern: [7, 5, 0, 0],

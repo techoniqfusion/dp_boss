@@ -47,9 +47,9 @@ class Validation{
     if (value!.isEmpty) {
       return "Required";
     } else if (!RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
         .hasMatch(value)) {
-      return "Please enter a valid email address";
+      return "Invalid email address";
     }
     return null;
   }

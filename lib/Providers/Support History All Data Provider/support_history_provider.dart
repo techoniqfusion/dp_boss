@@ -15,7 +15,6 @@ class SupportHistoryProvider extends ChangeNotifier{
       if(response.data['status'] == true){
         List temp = response.data['Support'];
         supportHistoryList = temp.map((e) => SupportHistoryModel.fromJson(e)).toList();
-        notifyListeners();
         return supportHistoryList;
       }
       else {

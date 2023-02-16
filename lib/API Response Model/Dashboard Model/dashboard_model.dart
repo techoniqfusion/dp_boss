@@ -2,6 +2,7 @@ class DashboardModel {
   bool? status;
   int? statusCode;
   String? message;
+  String? upi;
   String? wallet;
   String? date;
   String? time;
@@ -14,12 +15,15 @@ class DashboardModel {
         this.wallet,
         this.date,
         this.time,
-        this.gameData});
+        this.gameData,
+        this.upi
+      });
 
   DashboardModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     statusCode = json['status_code'];
     message = json['message'];
+    upi = json['upi'];
     wallet = json['wallet'];
     date = json['date'];
     time = json['time'];
@@ -36,6 +40,7 @@ class DashboardModel {
     data['status'] = this.status;
     data['status_code'] = this.statusCode;
     data['message'] = this.message;
+    data['upi'] = this.upi;
     data['wallet'] = this.wallet;
     data['date'] = this.date;
     data['time'] = this.time;
