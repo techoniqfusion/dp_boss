@@ -87,14 +87,14 @@ class _DashboardState extends State<Dashboard> {
                     bottom: 26,
                     child: Container(
                       padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                          color: AppColor.lightPurple,
-                          shape: BoxShape.circle),
-                      child: const Text(
-                        "2",
-                        style: TextStyle(color: Colors.white, fontSize: 11),
-                        textAlign: TextAlign.center,
-                      ),
+                      // decoration: const BoxDecoration(
+                      //     color: AppColor.lightPurple,
+                      //     shape: BoxShape.circle),
+                      // child: const Text(
+                      //   "2",
+                      //   style: TextStyle(color: Colors.white, fontSize: 11),
+                      //   textAlign: TextAlign.center,
+                      // ),
                     ),
                   ),
                 )

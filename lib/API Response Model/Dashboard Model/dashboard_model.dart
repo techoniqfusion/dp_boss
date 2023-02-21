@@ -6,6 +6,7 @@ class DashboardModel {
   String? wallet;
   String? date;
   String? time;
+  int? notificationCount;
   List<GameData>? gameData;
 
   DashboardModel(
@@ -16,7 +17,8 @@ class DashboardModel {
         this.date,
         this.time,
         this.gameData,
-        this.upi
+        this.upi,
+        this.notificationCount
       });
 
   DashboardModel.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,7 @@ class DashboardModel {
     wallet = json['wallet'];
     date = json['date'];
     time = json['time'];
+    notificationCount = json['notification_count'];
     if (json['game_data'] != null) {
       gameData = <GameData>[];
       json['game_data'].forEach((v) {
@@ -44,6 +47,7 @@ class DashboardModel {
     data['wallet'] = this.wallet;
     data['date'] = this.date;
     data['time'] = this.time;
+    data['notification_count'] = this.notificationCount;
     if (this.gameData != null) {
       data['game_data'] = this.gameData!.map((v) => v.toJson()).toList();
     }

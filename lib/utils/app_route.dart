@@ -6,6 +6,7 @@ import 'package:dp_boss/screens/Dashboard/dashboard.dart';
 import 'package:dp_boss/screens/Deposit%20Screen/deposit_screen.dart';
 import 'package:dp_boss/screens/Deposit%20Summary/deposit_summary.dart';
 import 'package:dp_boss/screens/Edit%20Profile/edit_profile.dart';
+import 'package:dp_boss/screens/Game%20Details/game_details.dart';
 import 'package:dp_boss/screens/Game%20Rate/game_rate.dart';
 import 'package:dp_boss/screens/Help%20&%20Support/help_and_support.dart';
 import 'package:dp_boss/screens/Notification%20Screen/notification.dart';
@@ -44,7 +45,8 @@ class RouteGenerator {
                 ));
       case AppScreen.dashboard:
         var arguments = settings.arguments as Map<String, dynamic>;
-        return MaterialPageRoute(builder: (_) =>  Dashboard(screenKey: arguments['key']));
+        return MaterialPageRoute(
+            builder: (_) => Dashboard(screenKey: arguments['key']));
       case AppScreen.editProfile:
         return MaterialPageRoute(builder: (_) => const EditProfile());
       case AppScreen.notificationScreen:
@@ -85,25 +87,31 @@ class RouteGenerator {
       case AppScreen.supremeDay:
         var arguments = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
-            builder: (_) => SupremeDay(id: arguments['id']));
+            builder: (_) => SupremeDay(
+                points: arguments['points'], gameName: arguments['gameName']));
       case AppScreen.depositScreen:
         var arguments = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
             builder: (_) => DepositScreen(upiId: arguments['upiId']));
+      case AppScreen.gameDetails:
+        var arguments = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+            builder: (_) => GameDetails(
+                points: arguments['points'],
+                gameType: arguments['gameType']));
       case AppScreen.depositSummary:
         var arguments = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
             builder: (_) => DepositSummary(
-                upiId: arguments['upiId'],
-                amount: arguments['amount'],
-            ));
+                  upiId: arguments['upiId'],
+                  amount: arguments['amount'],
+                ));
       case AppScreen.withdrawalScreen:
         return MaterialPageRoute(builder: (_) => WithdrawalScreen());
       case AppScreen.withdrawalAllData:
         return MaterialPageRoute(builder: (_) => WithdrawalAllData());
       case AppScreen.gameRate:
         return MaterialPageRoute(builder: (_) => GameRate());
-
     }
     return _errorRoute();
   }
@@ -146,4 +154,5 @@ class AppScreen {
   static const String withdrawalScreen = "withdrawalScreen";
   static const String withdrawalAllData = "withdrawalAllData";
   static const String gameRate = "gameRate";
+  static const String gameDetails = "gameDetails";
 }

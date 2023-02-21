@@ -270,4 +270,15 @@ class AppApi {
       throw errorMessage;
     }
   }
+
+  /// Notification API
+  Future notificationApi(){
+    try{
+      final response = dioClient.get("notification/get_all");
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
 }

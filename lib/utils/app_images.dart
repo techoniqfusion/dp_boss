@@ -21,6 +21,14 @@ class AppImages{
   static const String paytm = "${pngPath}paytm.png";
   static const String phonePe = "${pngPath}phonePe.png";
   static const String googlePay = "${pngPath}googlePay.png";
+  static const String doublePanna = "${pngPath}double_panna.png";
+  static const String fullSangam = "${pngPath}full_sangam.png";
+  static const String halfSangam = "${pngPath}half_sangam.png";
+  static const String jodiDigit = "${pngPath}jodi_digit.png";
+  static const String singleDigit = "${pngPath}single_digit.png";
+  static const String singlePanna = "${pngPath}single_panna.png";
+  static const String tripplePanna = "${pngPath}tripple_panna.png";
+  static const String zeroNotification = "${pngPath}zero_notification.png";
 
   ///  loader gif
   static const String loader = "assets/images/loader.gif";

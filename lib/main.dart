@@ -3,6 +3,7 @@ import 'package:dp_boss/Providers/Bank%20Details%20List%20Provider/bank_details_
 import 'package:dp_boss/Providers/Dashboard%20Provider/dashboard_provider.dart';
 import 'package:dp_boss/Providers/Deposit%20Summary%20Provider/deposit_summary_provider.dart';
 import 'package:dp_boss/Providers/Game%20Rate%20Provider/game_rate_provider.dart';
+import 'package:dp_boss/Providers/Notification%20Provider/notification_provider.dart';
 import 'package:dp_boss/Providers/Points%20Provider/points_provider.dart';
 import 'package:dp_boss/Providers/Profile%20Update%20Provider/profile_update_provider.dart';
 import 'package:dp_boss/Providers/Recover%20Password%20Provider/recover_password_provider.dart';
@@ -160,6 +161,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => DepositSummaryProvider()),
         ChangeNotifierProvider(create: (_) => WithdrawalAllDataProvider()),
         ChangeNotifierProvider(create: (_) => GameRateProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: MaterialApp(
         theme: ThemeData(

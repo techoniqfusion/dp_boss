@@ -135,7 +135,6 @@ class _EditProfileState extends State<EditProfile> {
                     "address": addressController.text,
                   });
                   provider.updateProfile(context, formData);
-                  FocusScope.of(context).unfocus();
                 }
               },
               isLoading:
@@ -219,7 +218,7 @@ class _EditProfileState extends State<EditProfile> {
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               RegExp(r"[a-zA-Z]+|\s")),
-                        ],
+                        ], // for allow only alphabets
                         keyboardType: TextInputType.text,
                         controller: fullNameController,
                         validator: Validation.validate,

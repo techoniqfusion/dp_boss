@@ -193,6 +193,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     return ListTile(
                                       contentPadding: EdgeInsets.zero,
                                       minLeadingWidth: 0,
+                                      horizontalTitleGap: 5,
                                       leading: Container(
                                         height: 51,
                                         width: 51,
@@ -285,7 +286,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   return tryAgain(onTap: () => setState(() {}));
                 }
               }
-              return shimmerEffect(homePageShimmer: false);
+              return shimmerEffect(isHomePageShimmer: false);
             }),
       ),
     );

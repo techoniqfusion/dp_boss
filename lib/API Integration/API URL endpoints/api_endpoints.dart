@@ -2,7 +2,8 @@ class Endpoints {
   Endpoints._();
 
   // base url
-  static const String baseUrl = "http://192.168.0.193/Main_Bazar_Matka/public/api/";
+  static const String baseUrl = "https://control.dpbosskalyanmatka.com/api/";
+      // "http://192.168.0.193/Main_Bazar_Matka/public/api/";
 
   //Image url
   static const String imageUrl = "https://panel.funcolor.in/";

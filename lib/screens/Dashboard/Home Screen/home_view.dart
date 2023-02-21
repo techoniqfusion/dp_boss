@@ -12,6 +12,7 @@ import '../../../Component/try_again.dart';
 import '../../../utils/app_color.dart';
 import '../../../utils/app_font.dart';
 import '../../../utils/app_route.dart';
+import '../../../utils/show_toast.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -27,6 +28,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    double _size = 10;
     final provider = Provider.of<DashboardProvider>(context, listen: false);
     return Scaffold(
         body: FutureBuilder(
@@ -202,14 +204,22 @@ class _HomeViewState extends State<HomeView> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 3.0),
                           child: ListTile(
-                            onTap:
-                                // day + "_status" == "active" ?
-                                () {
-                              print("game id ${gameList?[index].id}");
-                              Navigator.pushNamed(context, AppScreen.supremeDay,
-                                  arguments: {"id": gameList?[index].id});
+                            horizontalTitleGap: 5,
+                            onTap: openTime <= current_time &&
+                                        closeTime >= current_time ||
+                                    day + "_status" == "active"
+                                ? () {
+                                    print("game name ${gameList?[index].name}");
+                                    Navigator.pushNamed(
+                                        context, AppScreen.supremeDay,
+                                        arguments: {
+                                          "points": dashboardData.wallet,
+                                          "gameName": gameList?[index].name
+                                        });
+                                  }
+                                : (){
+                              showToast("Currently market is closed now, when the market will open, then you invest your money in this market, please wait.");
                             },
-                            // : null,
                             contentPadding: EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 15),
                             tileColor: AppColor.white,
@@ -242,21 +252,33 @@ class _HomeViewState extends State<HomeView> {
                                           fontSize: 14,
                                           fontFamily: AppFont.poppinsSemiBold),
                                     ),
-                                    Text(
-                                      openTime <= current_time &&
-                                                  closeTime >= current_time ||
-                                              day + "_status" == "active"
-                                          ? "Running"
-                                          : "Closed",
+                                    AnimatedDefaultTextStyle(
+                                      duration: Duration(milliseconds: 400),
                                       style: TextStyle(
                                           color: openTime <= current_time &&
-                                                      closeTime >=
-                                                          current_time ||
-                                                  day + "_status" == "active"
+                                              closeTime >=
+                                                  current_time ||
+                                              day + "_status" == "active"
                                               ? AppColor.neon
                                               : Colors.red,
-                                          fontSize: 14,
+                                          fontSize: _size,
                                           fontFamily: AppFont.poppinsSemiBold),
+                                      child: Text(
+                                        openTime <= current_time &&
+                                                    closeTime >= current_time ||
+                                                day + "_status" == "active"
+                                            ? "Running"
+                                            : "Closed",
+                                        // style: TextStyle(
+                                        //     color: openTime <= current_time &&
+                                        //                 closeTime >=
+                                        //                     current_time ||
+                                        //             day + "_status" == "active"
+                                        //         ? AppColor.neon
+                                        //         : Colors.red,
+                                        //     fontSize: 14,
+                                        //     fontFamily: AppFont.poppinsSemiBold),
+                                      ),
                                     )
                                   ],
                                 ),

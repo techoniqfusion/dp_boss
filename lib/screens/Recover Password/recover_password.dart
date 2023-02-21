@@ -88,7 +88,7 @@ class _RecoverPasswordState extends State<RecoverPassword> {
                 maxLength: 10,
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(
-                    RegExp(r"[0-9]"), // allow only numbers
+                    RegExp(r"\d"), // allow only numbers
                   )
                 ],
                 keyboardType: TextInputType.number,

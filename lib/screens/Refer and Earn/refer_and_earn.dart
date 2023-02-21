@@ -1,5 +1,6 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:dp_boss/Component/custom_snackbar.dart';
+import 'package:dp_boss/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,13 +30,6 @@ class _ReferAndEarnState extends State<ReferAndEarn> {
   void dispose() {
     referralAmountController.dispose();
     super.dispose();
-  }
-
-  String? validate(String? value) {
-    if (value!.isEmpty) {
-      return "Required";
-    }
-    return null;
   }
 
   Future getRefresh() async{
@@ -128,7 +122,7 @@ class _ReferAndEarnState extends State<ReferAndEarn> {
                                         RegExp(r"\d"),
                                       )
                                     ],
-                                    validator: validate,
+                                    validator: Validation.validate,
                                     controller: referralAmountController,
                                     // padding: EdgeInsets.only(bottom: 20, top: 10),
                                     hintText: "Enter Referral Amount",
