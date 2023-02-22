@@ -34,11 +34,10 @@ class _AddBankAccountState extends State<AddBankAccount> {
   @override
   void dispose() {
     accHolderNameController.dispose();
-    ifscController.dispose();
-    bankNameController.dispose();
     accountNumberController.dispose();
-    bankNameController.dispose();
+    ifscController.dispose();
     branchController.dispose();
+    bankNameController.dispose();
     super.dispose();
   }
 
@@ -82,8 +81,11 @@ class _AddBankAccountState extends State<AddBankAccount> {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.popAndPushNamed(
-                                  context, AppScreen.dashboard);
+                              Navigator.pushNamedAndRemoveUntil(context,
+                                  AppScreen.dashboard, (route) => false,
+                                  arguments: {'key': 'Account'}).then((value) {
+                                setState(() {});
+                              });
                             },
                             child: const Text("okay"),
                           ),

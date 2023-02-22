@@ -22,17 +22,6 @@ class ProfileUpdateProvider extends ChangeNotifier {
         print("mobile number on response => ${res.mobile}");
         print("address data from response => ${response.data['data']}");
         await sqliteDb.updateUserData(res);
-        popUp(
-          context: context, title: response.data['message'], // show popUp
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("okay"),
-            ),
-          ],
-        );
         updateLoader(false);
       }
       else {
@@ -64,7 +53,9 @@ class ProfileUpdateProvider extends ChangeNotifier {
           );
         }
       }
+      return response.data;
     } catch (error) {
+      updateLoader(false);
       print("Update Profile API error $error");
       rethrow;
     }

@@ -14,7 +14,11 @@ class AppImages{
   static const String walletCard = "${pngPath}wallet_card.png";
   static const String offer = "${pngPath}offer.png";
   static const String twitter = "${pngPath}twitter.png";
+  static const String twitterIcon = "${pngPath}twitter_icon.png";
   static const String more = "${pngPath}more.png";
+  static const String playButton = "${pngPath}play-button.png";
+  static const String lockIcon = "${pngPath}lock_icon.png";
+  static const String graphIcon = "${pngPath}graph_icon.png";
   static const String whatsApp = "${pngPath}whatsapp.png";
   static const String errorImg = "${pngPath}error.png";
   static const String avatar = "${pngPath}avatar.png";
@@ -50,4 +54,6 @@ class AppImages{
   static const String robot = "${svgPath}robot.svg";
   static const String creditIcon = "${svgPath}credit_icon.svg";
   static const String debitIcon = "${svgPath}debit_icon.svg";
+  static const String telegramIcon = "${svgPath}telegram_icon.svg";
+  static const String whatsApp_icon = "${svgPath}whatsApp_icon.svg";
 }

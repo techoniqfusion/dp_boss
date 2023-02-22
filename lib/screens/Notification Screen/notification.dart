@@ -114,11 +114,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                     )
                     : Center(
-                        child: Image.asset(AppImages.zeroNotification),
+                        child: Image.asset(AppImages.zeroNotification,height: 179,),
                       );
               } else {
                 return tryAgain(onTap: () {
-                  setState(() {});
+                  setState((){});
                 });
               }
             }

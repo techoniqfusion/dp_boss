@@ -236,8 +236,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           body: FutureBuilder(
             future: getVerification(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) if (snapshot
-                  .hasData) {
+              if (snapshot.hasData) {
                 var response = snapshot.data;
                 return response['status_code'] == 203
                     ? Stepper(
@@ -392,18 +391,24 @@ class _VerifyScreenState extends State<VerifyScreen> {
                       )
                     : response['User_status'] == "Success"
                         ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.verified,color: AppColor.neon,size: 40,),
-                            SizedBox(height: 5,),
-                            Center(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.verified,
+                                color: AppColor.neon,
+                                size: 40,
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Center(
                                 child: Text(
                                   response["message"],
                                   style: fontStyle,
                                 ),
                               ),
-                          ],
-                        )
+                            ],
+                          )
                         : response['User_status'] == "Pending"
                             ? Center(
                                 child: Text(
@@ -431,10 +436,13 @@ class _VerifyScreenState extends State<VerifyScreen> {
                                           style: fontStyle,
                                         ),
                                       );
-              } else {
-                return tryAgain(onTap: () => setState(() {}));
               }
-              return customLoader();
+              else {
+                if(snapshot.hasData){
+                  return tryAgain(onTap: () => setState(() {}));
+                }
+                return customLoader();
+              }
             },
           )),
     );

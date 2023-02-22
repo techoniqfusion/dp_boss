@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import '../../API Response Model/Registration Model/registration_model.dart';
 import '../../Component/custom_dropdown.dart';
 import '../../Component/custom_loader.dart';
+import '../../Component/pop_up.dart';
 import '../../Component/textheading.dart';
 import '../../Providers/Profile Update Provider/profile_update_provider.dart';
 import '../../model/StateModel.dart';
@@ -57,9 +58,6 @@ class _EditProfileState extends State<EditProfile> {
     selectStateData();
     getUserData().then((value) => {
           fullNameController.text = value.name,
-          // emailController.text = value.email,
-          // dobController.text = value.dob,
-          // addressController.text = value.address,
           mobileNumberController.text = value.mobile
         });
     super.initState();
@@ -117,41 +115,15 @@ class _EditProfileState extends State<EditProfile> {
         return true;
       },
       child: Scaffold(
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-          child: CustomButton(
-              onPressed: () async {
-                // SharedPreferences prefs = await SharedPreferences.getInstance();
-                // var authToken = prefs.getString("userToken");
-                // print("user token ${authToken}");
-                var isValidate = formKey.currentState?.validate();
-                if (isValidate != null && isValidate == true) {
-                  var formData = FormData.fromMap({
-                    "email": emailController.text,
-                    "state": selectedState,
-                    "dob": dobController.text,
-                    "gender": selectedGender,
-                    "city": selectedCity,
-                    "address": addressController.text,
-                  });
-                  provider.updateProfile(context, formData);
-                }
-              },
-              isLoading:
-                  context.watch<ProfileUpdateProvider>().profileUpdateLoader,
-              backgroundColor:
-                  MaterialStateProperty.all<Color>(AppColor.lightYellow),
-              buttonText: "Submit"),
-        ),
         appBar: AppBar(
           elevation: 1,
           backgroundColor: Colors.white,
           leading: iconCard(
               icon: SvgPicture.asset(AppImages.backIcon),
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(context, AppScreen.dashboard,
-                        (route) => false,
-                    arguments: {'key' : 'Profile'});
+                Navigator.pushNamedAndRemoveUntil(
+                    context, AppScreen.dashboard, (route) => false,
+                    arguments: {'key': 'Profile'});
               }),
           title: const Text(
             "Update Profile",
@@ -167,6 +139,10 @@ class _EditProfileState extends State<EditProfile> {
               if (snapshot.hasData) {
                 var data = snapshot.data as UserData;
                 print("mobile number => ${data.mobile}");
+
+                if (data.mobile != null && data.mobile != "null") {
+                  mobileNumberController.text = data.mobile ?? "";
+                }
 
                 if (data.email != null && data.email != "null") {
                   emailController.text = data.email.toString();
@@ -263,9 +239,10 @@ class _EditProfileState extends State<EditProfile> {
                       /// Select Gender Dropdown
                       StatefulBuilder(builder: (context, setDropDown) {
                         return CustomDropdown(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           hint: const Text("select gender"),
                           validator: (value) =>
-                              value == null ? "Select gender" : null,
+                              value == null ? 'Required' : null,
                           // dropdownColor: Colors.blueAccent,
                           value: selectedGender,
                           onChanged: (newValue) {
@@ -285,6 +262,9 @@ class _EditProfileState extends State<EditProfile> {
 
                       /// DOB TextField
                       CustomTextField(
+                        onTap: () {
+                          _selectDate(context);
+                        },
                         readOnly: true,
                         validator: Validation.validate,
                         controller: dobController,
@@ -335,6 +315,8 @@ class _EditProfileState extends State<EditProfile> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CustomDropdown(
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
                               hint: const Text("choose state"),
                               validator: (value) {
                                 if (value == null) {
@@ -369,13 +351,12 @@ class _EditProfileState extends State<EditProfile> {
                               height: 20,
                             ),
                             textHeading(text: "Select City"),
-
                             CustomDropdown(
                                 // autovalidateMode:
                                 //     AutovalidateMode.onUserInteraction,
                                 hint: const Text("choose city"),
                                 validator: (value) =>
-                                    value == null ? "Select City" : null,
+                                    value == null ? 'Required' : null,
                                 value: selectedCity,
                                 onChanged: selectedState != null
                                     ? (val) {
@@ -400,6 +381,51 @@ class _EditProfileState extends State<EditProfile> {
                           ],
                         );
                       }),
+
+                      SizedBox(height: 20,),
+
+                      CustomButton(
+                          onPressed: () async {
+                            // SharedPreferences prefs = await SharedPreferences.getInstance();
+                            // var authToken = prefs.getString("userToken");
+                            // print("user token ${authToken}");
+                            var isValidate = formKey.currentState?.validate();
+                            if (isValidate != null && isValidate == true) {
+                              var formData = FormData.fromMap({
+                                "email": emailController.text,
+                                "state": selectedState,
+                                "dob": dobController.text,
+                                "gender": selectedGender,
+                                "city": selectedCity,
+                                "address": addressController.text,
+                              });
+                              final response =
+                              await provider.updateProfile(context, formData);
+                              if (response['status_code'] == 200) {
+                                popUp(
+                                  context: context,
+                                  title: response['message'], // show popUp
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pushNamedAndRemoveUntil(
+                                            context, AppScreen.dashboard, (route) => false,
+                                            arguments: {'key': 'Profile'}).then((value) {
+                                          setState(() {});
+                                        });
+                                      },
+                                      child: const Text("okay"),
+                                    ),
+                                  ],
+                                );
+                              }
+                            }
+                          },
+                          isLoading:
+                          context.watch<ProfileUpdateProvider>().profileUpdateLoader,
+                          backgroundColor:
+                          MaterialStateProperty.all<Color>(AppColor.lightYellow),
+                          buttonText: "Submit"),
                     ],
                   ),
                 );

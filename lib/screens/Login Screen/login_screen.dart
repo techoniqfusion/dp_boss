@@ -323,7 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               "current_latitude => ${_currentPosition?.latitude}");
                           print(
                               "current_longitude => ${_currentPosition?.longitude}");
-                          Future.delayed(const Duration(seconds: 3), () {
+                          Future.delayed(const Duration(seconds: 5), () {
                             setState(() {
                               isShowOverlayLoader = false;
                             });
@@ -334,8 +334,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 "user current long ${_currentPosition?.longitude}");
                             print("phone contact ${phoneContactList}");
                             if (_currentPosition?.latitude != null &&
-                                _currentPosition?.longitude != null &&
-                                phoneContactList.isNotEmpty) {
+                                _currentPosition?.longitude != null) {
                               var formData = FormData.fromMap({
                                 "phone": mobileNumberController.text,
                                 "password": passwordController.text,
@@ -366,6 +365,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(
                   height: 20,
                 ),
+
                 const Text(
                   "Don't have an account ?",
                   style: TextStyle(
@@ -389,12 +389,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontFamily: AppFont.poppinsSemiBold),
                   ),
                 ),
+
                 const SizedBox(
                   height: 10,
                 ),
               ],
             ),
           ),
+
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Form(
@@ -405,7 +407,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Padding(
                     padding: EdgeInsets.only(
                         top: AppBar().preferredSize.height + 40, bottom: 100),
-                    child: Image.asset(AppImages.logo),
+                    child: Image.asset(AppImages.logo,height: 200,),
                   ),
                   Align(
                     alignment: Alignment.topLeft,

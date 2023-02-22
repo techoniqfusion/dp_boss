@@ -5,6 +5,7 @@ import 'package:dp_boss/utils/app_images.dart';
 import 'package:dp_boss/utils/app_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Component/icon_card.dart';
 import '../../model/bottom_navigation_model.dart';
 import '../../utils/app_color.dart';
@@ -46,11 +47,24 @@ class _DashboardState extends State<Dashboard> {
       bottomIcon: AppImages.historyIcon,
     ),
   ];
+  String? notificationCount;
 
+  @override
+  void initState() {
+    super.initState();
+    getNotificationCount();
+  }
+
+  void getNotificationCount() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      notificationCount = prefs.getString("notificationCount");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-
+    print("notification count ${notificationCount}");
     for (var element in list) {
       if(element.title == widget.screenKey){
         element.isSelect = true;
@@ -87,14 +101,14 @@ class _DashboardState extends State<Dashboard> {
                     bottom: 26,
                     child: Container(
                       padding: const EdgeInsets.all(3),
-                      // decoration: const BoxDecoration(
-                      //     color: AppColor.lightPurple,
-                      //     shape: BoxShape.circle),
-                      // child: const Text(
-                      //   "2",
-                      //   style: TextStyle(color: Colors.white, fontSize: 11),
-                      //   textAlign: TextAlign.center,
-                      // ),
+                      decoration: const BoxDecoration(
+                          color: AppColor.lightPurple,
+                          shape: BoxShape.circle),
+                      child: Text(
+                        notificationCount ?? "",
+                        style: TextStyle(color: Colors.white, fontSize: 11),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 )
@@ -137,7 +151,6 @@ class _DashboardState extends State<Dashboard> {
               InkWell(
                 highlightColor: Colors.transparent,
                 hoverColor: Colors.transparent,
-                //enableFeedback: false,
                   onTap: () {
                     // for (var element in list) {
                     //   element.isSelect = false;

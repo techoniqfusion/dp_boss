@@ -281,4 +281,15 @@ class AppApi {
       throw errorMessage;
     }
   }
+
+  /// Notification API
+  Future supportDetailsApi(){
+    try{
+      final response = dioClient.get("get-support-details");
+      return response;
+    } on DioError catch(error){
+      final errorMessage = DioExceptions.fromDioError(error).toString();
+      throw errorMessage;
+    }
+  }
 }

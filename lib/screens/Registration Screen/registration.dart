@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:dp_boss/Providers/Registration%20Provider/registration_provider.dart';
+import 'package:dp_boss/utils/open_whatsApp.dart';
 import 'package:dp_boss/utils/validation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../API Integration/call_api.dart';
+import '../../API Response Model/Support Details Model/support_details_model.dart';
 import '../../Component/custom_button.dart';
 import '../../Component/custom_textfield.dart';
 import '../../Component/pop_up.dart';
@@ -34,10 +38,25 @@ class _RegistrationState extends State<Registration> {
   bool referCodeStatus = false;
   bool isReadOnly = false;
   final appApi = AppApi();
+  var supportDetails;
 
   @override
   void initState() {
     super.initState();
+    getSupportDetails().then((value) {
+      // setState(() {
+      supportDetails = value;
+      // });
+    });
+  }
+
+  Future getSupportDetails() async {
+    final response = await appApi.supportDetailsApi();
+    if (response.data['status'] == true) {
+      final responseData = SupportModel.fromJson(response.data['support_data']);
+      // print("user whatsApp number ${responseData.whatsapp}");
+      return responseData;
+    }
   }
 
   /// validation for confirm password
@@ -73,8 +92,8 @@ class _RegistrationState extends State<Registration> {
             children: [
               Padding(
                 padding: EdgeInsets.only(
-                    top: AppBar().preferredSize.height + 40, bottom: 100),
-                child: Image.asset(AppImages.logo),
+                    top: AppBar().preferredSize.height + 40, bottom: 50),
+                child: Image.asset(AppImages.logo, height: 200),
               ),
 
               Align(
@@ -170,9 +189,9 @@ class _RegistrationState extends State<Registration> {
                 hintText: "Confirm Password",
               ),
 
-              SizedBox(
-                height: 15,
-              ),
+              // SizedBox(
+              //   height: 15,
+              // ),
 
               StatefulBuilder(builder: (context, setTextField) {
                 return Column(
@@ -321,6 +340,50 @@ class _RegistrationState extends State<Registration> {
                 height: 15,
               ),
 
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                      onTap: () {
+                        print("whatsApp number ${supportDetails.whatsapp}");
+                        OpenSocialMediaApp.openWhatsApp(
+                            mobileNumber: supportDetails.whatsapp ?? "",
+                            context: context);
+                      },
+                      child: SvgPicture.asset(
+                        AppImages.whatsApp_icon,
+                      )),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    child: SvgPicture.asset(
+                      AppImages.telegramIcon,
+                    ),
+                    onTap: () async {
+                      Uri phoneNumber = Uri.parse(supportDetails.telegram);
+                      await launchUrl(phoneNumber);
+                    },
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () async {
+                      print("phone number ${supportDetails.callOne}");
+                      Uri phoneNumber = Uri.parse('tel:${supportDetails.callOne}');
+                      await launchUrl(phoneNumber);
+                    },
+                    icon: Icon(Icons.call, size: 35),
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                height: 15,
+              ),
+
               Text.rich(TextSpan(
                   text: "By continuing you agree to the ",
                   style: TextStyle(
@@ -336,6 +399,7 @@ class _RegistrationState extends State<Registration> {
                             fontFamily: AppFont.poppinsSemiBold),
                         recognizer: TapGestureRecognizer()..onTap = () {})
                   ])),
+
               SizedBox(
                 height: 15,
               ),

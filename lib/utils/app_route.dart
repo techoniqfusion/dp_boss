@@ -6,6 +6,7 @@ import 'package:dp_boss/screens/Dashboard/dashboard.dart';
 import 'package:dp_boss/screens/Deposit%20Screen/deposit_screen.dart';
 import 'package:dp_boss/screens/Deposit%20Summary/deposit_summary.dart';
 import 'package:dp_boss/screens/Edit%20Profile/edit_profile.dart';
+import 'package:dp_boss/screens/Game%20Chart/game_chart.dart';
 import 'package:dp_boss/screens/Game%20Details/game_details.dart';
 import 'package:dp_boss/screens/Game%20Rate/game_rate.dart';
 import 'package:dp_boss/screens/Help%20&%20Support/help_and_support.dart';
@@ -112,6 +113,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => WithdrawalAllData());
       case AppScreen.gameRate:
         return MaterialPageRoute(builder: (_) => GameRate());
+      case AppScreen.gameChart:
+        return MaterialPageRoute(builder: (_) => GameChart());
     }
     return _errorRoute();
   }
@@ -155,4 +158,5 @@ class AppScreen {
   static const String withdrawalAllData = "withdrawalAllData";
   static const String gameRate = "gameRate";
   static const String gameDetails = "gameDetails";
+  static const String gameChart = "gameChart";
 }

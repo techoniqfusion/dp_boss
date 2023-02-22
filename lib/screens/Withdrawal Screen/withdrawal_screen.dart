@@ -79,31 +79,36 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               final bankDetailList = snapshot.data as BankDetailsListModel;
               // var descendingOrder = bankDetailList.reversed.toList();
               // print("History data is ${historyData.first.subject}");
-              return ListView(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                children: [
-                  CustomTextField(
-                    controller: withdrawAmountController,
-                    hintText: "Enter Amount",
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r"\d"), // allow only numbers
-                      )
-                    ],
-                    keyboardType: TextInputType.number,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Select Bank Account",
-                    style: TextStyle(color: AppColor.black, fontSize: 14),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  bankDetailList.data != null
-                      ? StatefulBuilder(
+              return bankDetailList.data!.isNotEmpty
+                  ? ListView(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                      children: [
+                        CustomTextField(
+                          controller: withdrawAmountController,
+                          hintText: "Enter Amount",
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r"\d"), // allow only numbers
+                            )
+                          ],
+                          keyboardType: TextInputType.number,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Visibility(
+                          visible: bankDetailList.data!.isNotEmpty,
+                          child: Text(
+                            "Select Bank Account",
+                            style:
+                                TextStyle(color: AppColor.black, fontSize: 14),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        StatefulBuilder(
                           builder: (context, setRadio) {
                             return ListView.builder(
                               itemCount: bankDetailList.data?.length,
@@ -170,84 +175,87 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                               },
                             );
                           },
-                        )
-                      : Center(
-                          child: Text(
-                            "Add your bank",
-                            style: TextStyle(color: AppColor.black),
-                          ),
                         ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  CustomButton(
-                    isLoading:
-                        context.watch<BankDetailsListProvider>().buttonLoader,
-                    backgroundColor:
-                        MaterialStatePropertyAll(AppColor.lightYellow),
-                    buttonText: "Withdraw",
-                    onPressed: () async {
-                      if (withdrawAmountController.text.isEmpty) {
-                        popUp(
-                          context: context,
-                          title: "Enter Amount",
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("okay"),
-                            ),
-                          ],
-                        );
-                      } else {
-                        if (bankId == null) {
-                          popUp(
-                            context: context,
-                            title: "Select Bank Account",
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("okay"),
-                              ),
-                            ],
-                          );
-                        } else {
-                          var formData = FormData.fromMap({
-                            "amount": withdrawAmountController.text,
-                            "id": bankId
-                          });
-                          final response = await provider.withdrawalRequest(
-                              context, formData);
-                          if (response["status_code"] == 200) {
-                            popUp(
-                              context: context,
-                              title: response["message"],
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamedAndRemoveUntil(
-                                            context,
-                                            AppScreen.dashboard,
-                                            (route) => false,
-                                            arguments: {'key': 'Home'})
-                                        .then((value) {
-                                      setState(() {});
-                                    });
-                                  },
-                                  child: const Text("okay"),
-                                ),
-                              ],
-                            );
-                          }
-                        }
-                      }
-                    },
-                  ),
-                ],
-              );
+                        SizedBox(
+                          height: 50,
+                        ),
+                        CustomButton(
+                          isLoading: context
+                              .watch<BankDetailsListProvider>()
+                              .buttonLoader,
+                          backgroundColor:
+                              MaterialStatePropertyAll(AppColor.lightYellow),
+                          buttonText: "Withdraw",
+                          onPressed: () async {
+                            if (withdrawAmountController.text.isEmpty) {
+                              popUp(
+                                context: context,
+                                title: "Enter Amount",
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("okay"),
+                                  ),
+                                ],
+                              );
+                            } else {
+                              if (bankId == null) {
+                                popUp(
+                                  context: context,
+                                  title: "Select Bank Account",
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("okay"),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                var formData = FormData.fromMap({
+                                  "amount": withdrawAmountController.text,
+                                  "id": bankId
+                                });
+                                final response = await provider
+                                    .withdrawalRequest(context, formData);
+                                if (response["status_code"] == 200) {
+                                  popUp(
+                                    context: context,
+                                    title: response["message"],
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pushNamedAndRemoveUntil(
+                                                  context,
+                                                  AppScreen.dashboard,
+                                                  (route) => false,
+                                                  arguments: {'key': 'Home'})
+                                              .then((value) {
+                                            setState(() {});
+                                          });
+                                        },
+                                        child: const Text("okay"),
+                                      ),
+                                    ],
+                                  );
+                                }
+                              }
+                            }
+                          },
+                        ),
+                      ],
+                    )
+                  : Center(
+                      child: Text(
+                        "Add your bank details",
+                        style: TextStyle(
+                            color: AppColor.black,
+                            fontFamily: AppFont.poppinsSemiBold),
+                      ),
+                    );
             } else {
               return tryAgain(onTap: () => setState(() {}));
             }

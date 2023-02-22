@@ -40,10 +40,10 @@ class _ProfileViewState extends State<ProfileView> {
       List list = await sqliteDb.getUser();
       final data = UserData.fromJson(list.first);
       // print("function Called!!..");
-      setState(() {
+       setState(() {
         userName = data.name!;
         userEmail = data.email!;
-      });
+       });
     } catch (e) {
       print(e);
     }
